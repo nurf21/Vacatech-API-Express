@@ -2,9 +2,64 @@ const bcrypt = require("bcrypt");
 const helper = require("../helper/index");
 const jwt = require("jsonwebtoken");
 
-const { getAllUser, checkUser } = require("../model/users");
+const { getAllUser, postUser, checkUser } = require("../model/users");
 
 module.exports = {
+  registerUser: async (request, response) => {
+    console.log(request.body);
+    const {
+      user_email,
+      user_password,
+      user_name,
+      user_phone,
+      company_name,
+      company_depart,
+    } = request.body;
+    const salt = bcrypt.genSaltSync(8); //(8)berapa kali password diacak
+    const encryptPassword = bcrypt.hashSync(user_password, salt);
+    const checkEmail = await checkUser(user_email);
+    if (checkEmail.length > 0) {
+      return helper.response(response, 400, "Your email is already taken");
+    } else {
+      const setData = {
+        // user_email : user_email karena sama namanya
+        user_email,
+        user_password: encryptPassword,
+        user_name,
+        user_img:
+          request.file === undefined ? "blank.png" : request.file.filename,
+        user_role: 2,
+        user_phone,
+        company_name,
+        company_depart,
+        user_created_at: new Date(),
+        user_status: 1,
+      };
+      try {
+        if (user_password.length < 8) {
+          return helper.response(response, 400, "Minimum Eight Characters");
+        } else if (!user_email.match("@")) {
+          return helper.response(response, 400, "Invalid,Missing Character.");
+        } else if (user_email === "") {
+          return helper.response(response, 400, "Input Email,Please");
+        } else if (user_name === "") {
+          return helper.response(response, 400, "Input Username,Please");
+        } else {
+          const result = await postUser(setData);
+          console.log(result);
+          return helper.response(
+            response,
+            200,
+            "Success Register User",
+            result
+          );
+        }
+      } catch (error) {
+        return helper.response(response, 400, "Bad Request");
+      }
+    }
+    // console.log(setData);
+  },
   getAllUser: async (request, response) => {
     try {
       const result = await getAllUser();
@@ -12,7 +67,7 @@ module.exports = {
       //   console.log(result);
     } catch (error) {
       return helper.response(response, 400, "Bad Request", error);
-      //   console.log(error);
+      console.log(error);
     }
   },
   loginUser: async (request, response) => {
@@ -42,14 +97,22 @@ module.exports = {
             user_id,
             user_email,
             user_name,
+            user_img,
             user_role,
+            user_phone,
+            company_name,
+            company_depart,
             user_status,
           } = checkDataUser[0];
           let payload = {
             user_id,
             user_email,
             user_name,
+            user_img,
             user_role,
+            user_phone,
+            company_name,
+            company_depart,
             user_status,
           };
           if (user_status == 0) {

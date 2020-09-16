@@ -1,13 +1,6 @@
 const connection = require("../config/mysql");
 
 module.exports = {
-  getAllUser: () => {
-    return new Promise((resolve, reject) => {
-      connection.query("SELECT * FROM user", (error, result) => {
-        !error ? resolve(result) : reject(new Error(error));
-      });
-    });
-  },
   postUser: (setData) => {
     return new Promise((resolve, reject) => {
       connection.query("INSERT INTO user SET ?", setData, (error, result) => {
@@ -31,6 +24,25 @@ module.exports = {
         email,
         (error, result) => {
           !error ? resolve(result) : reject(new Error(error));
+        }
+      );
+    });
+  },
+  changePassword: (setData, email) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        "UPDATE user SET ? WHERE user_email = ?",
+        [setData, email],
+        (error, result) => {
+          if (!error) {
+            const newResult = {
+              user_email: email,
+              ...setData,
+            };
+            resolve(newResult);
+          } else {
+            reject(new Error(error));
+          }
         }
       );
     });

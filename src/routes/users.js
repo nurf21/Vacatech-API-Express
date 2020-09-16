@@ -1,16 +1,16 @@
-const router = require("express").Router();
-const {
-  getAllUser,
-  loginUser,
-  regWorker,
+const router = require('express').Router()
+const { 
+  loginUser, 
+  regWorker, 
   regRecruiter,
-} = require("../controller/users");
-const { authorization2 } = require("../middleware/auth");
+  forgotPassword,
+  changePassword, 
+} = require('../controller/users')
 
-router.get("/", authorization2, getAllUser);
-router.post("/login", loginUser);
-router.post("/register/worker", regWorker);
-router.post("/register/recruiter", regRecruiter);
-// router.post('/register', registerUser)
+router.post('/login', loginUser)
+router.post('/register/worker', regWorker)
+router.post('/register/recruiter', regRecruiter)
+router.post("/forgot", forgotPassword);
+router.patch("/change", changePassword);
 
 module.exports = router;

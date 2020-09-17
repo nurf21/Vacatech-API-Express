@@ -1,8 +1,9 @@
 const bcrypt = require('bcrypt')
-const helper = require('../helper/index')
+const helper = require('../helper')
 const jwt = require('jsonwebtoken')
+const nodemailer = require('nodemailer')
 
-const { postUser, checkUser } = require('../model/users')
+const { postUser, checkUser, changePassword } = require('../model/users')
 
 module.exports = {
   regWorker: async (request, response) => {
@@ -112,6 +113,104 @@ module.exports = {
       }
     } catch (error) {
       return helper.response(response, 400, 'Bad Request')
+    }
+  },
+  forgotPassword: async (request, response) => {
+    try {
+      const keys = Math.round(Math.random() * 100000)
+      const checkDataUser = await checkUser(request.body.user_email)
+      if (checkDataUser.length >= 1) {
+        const data = {
+          user_key: keys,
+          user_updated_at: new Date()
+        }
+        await changePassword(data, request.body.user_email)
+        const transporter = nodemailer.createTransport({
+          host: 'smtp.gmail.com',
+          port: 465,
+          secure: true,
+          auth: {
+            user: process.env.USER,
+            pass: process.env.PASS
+          }
+        })
+        await transporter.sendMail({
+          from: '"Vacatech"',
+          to: request.body.user_email,
+          subject: 'Vacatech - Forgot Password',
+          html: `Your code is <b>${keys}</b>`
+        }),
+        function (error) {
+          if (error) {
+            return helper.response(response, 400, 'Email not sent !')
+          }
+        }
+        return helper.response(response, 200, 'Email has been sent !')
+      } else {
+        return helper.response(response, 400, 'Email is not Registered !')
+      }
+    } catch (error) {
+      console.log(error)
+      return helper.response(response, 400, 'Bad Request', error)
+    }
+  },
+  changePassword: async (request, response) => {
+    try {
+      const checkDataUser = await checkUser(request.body.user_email)
+      if (checkDataUser.length > 0) {
+        const setData = {
+          user_key: request.body.user_key,
+          user_password: request.body.user_password,
+          user_updated_at: new Date()
+        }
+        const difference = setData.user_updated_at - checkDataUser[0].user_updated_at
+        const minutesDifference = Math.floor(difference / 1000 / 60)
+        if (minutesDifference > 5) {
+          const data = {
+            user_key: '',
+            user_updated_at: new Date()
+          }
+          await changePassword(data, request.body.user_email)
+          return helper.response(response, 400, 'Key has expired')
+        } else if (
+          request.body.user_key === undefined ||
+          request.body.user_key === null ||
+          request.body.user_key === ''
+        ) {
+          return helper.response(response, 400, 'Key must be filled !')
+        } else if (
+          request.body.user_password === undefined ||
+          request.body.user_password === null ||
+          request.body.user_password === ''
+        ) {
+          return helper.response(response, 400, 'Password must be filled !')
+        } else if (
+          request.body.confirm_password === undefined ||
+          request.body.confirm_password === null ||
+          request.body.confirm_password === '') {
+          return helper.response(response, 400, 'Confirm Password must be filled !')
+        } else if (
+          request.body.user_password.length < 8 ||
+          request.body.user_password.length > 16
+        ) {
+          return helper.response(response, 400, 'Password must be 8-16 characters')
+        } else if (request.body.confirm_password !== request.body.user_password) {
+          return helper.response(response, 400, "Password didn't match")
+        } else if (setData.user_key !== checkDataUser[0].user_key) {
+          return helper.response(response, 400, 'Wrong key !')
+        } else {
+          const salt = bcrypt.genSaltSync(10)
+          const encryptPassword = bcrypt.hashSync(request.body.user_password, salt)
+          setData.user_password = encryptPassword
+          setData.user_key = ''
+        }
+        const result = await changePassword(setData, request.body.user_email)
+        return helper.response(response, 200, 'Success Password Updated', result)
+      } else {
+        return helper.response(response, 404, `User By email: ${request.body.user_email} Not Found`)
+      }
+    } catch (error) {
+      return helper.response(response, 404, 'Bad Request', error)
     }
   }
 }

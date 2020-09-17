@@ -148,7 +148,7 @@ module.exports = {
           from: '"Vacatech"',
           to: user_email,
           subject: "Vacatech - Forgot Password",
-          html: `<a href="http://localhost:8080/changePassword?keys=${keys}">Click Here To Change Password</a>`,
+          html: `<a href="http://localhost:8080/setpassword?keys=${keys}">Click Here To Change Password</a>`,
         }),
         function (error) {
           if (error) {
@@ -157,7 +157,7 @@ module.exports = {
         }
         return helper.response(response, 200, 'Email has been sent !')
       } else {
-        return helper.response(response, 400, 'Email is not Registered !')
+        return helper.response(response, 400, 'Email is not registered !')
       }
     } catch (error) {
       return helper.response(response, 400, 'Bad Request', error)
@@ -173,7 +173,7 @@ module.exports = {
         request.query.keys === null ||
         request.query.keys === ""
       ) {
-        return helper.response(response, 400, "Key Not Found !");
+        return helper.response(response, 400, "Invalid Key");
       }
       if (checkDataUser.length > 0) {
         const email = checkDataUser[0].user_email
@@ -210,8 +210,6 @@ module.exports = {
           return helper.response(response, 400, "Password must be 8-16 characters")
         }else if (request.body.confirm_password !== request.body.user_password) {
           return helper.response(response, 400, "Password didn't match");
-        } else if (setData.user_key !== checkDataUser[0].user_key){
-          return helper.response(response, 400, "Wrong key !")
         } else {
           const salt = bcrypt.genSaltSync(10);
           const encryptPassword = bcrypt.hashSync(user_password, salt);
@@ -221,7 +219,73 @@ module.exports = {
         const result = await changePassword(setData, email);
         return helper.response(response, 200, "Success Password Updated", result);
       } else {
-        return helper.response(response, 404, `Key Not Found !`);
+        return helper.response(response, 404, `Invalid key`);
+      }
+    } catch (error) {
+      return helper.response(response, 404, "Bad Request", error);
+    }
+  },
+  activationEmail: async (request, response) => {
+    try {
+      const { user_email } = request.body;
+      const keys = Math.round(Math.random() * 100000);
+      const checkDataUser = await checkUser(user_email);
+      if (checkDataUser.length >= 1) {
+        const data = {
+          user_key: keys,
+          user_updated_at: new Date()
+        }
+        await changePassword(data, user_email)
+        const transporter = nodemailer.createTransport({
+          host: 'smtp.gmail.com',
+          port: 465,
+          secure: true,
+          auth: {
+            user: process.env.USER,
+            pass: process.env.PASS
+          }
+        })
+        await transporter.sendMail({
+          from: '"Vacatech"',
+          to: user_email,
+          subject: "Vacatech - Forgot Password",
+          html: `<a href="http://localhost:8080/activate?keys=${keys}">Click Here To Activate Your Account</a>`,
+        }),
+        function (error) {
+          if (error) {
+            return helper.response(response, 400, 'Email not sent !')
+          }
+        }
+        return helper.response(response, 200, 'Email has been sent !')
+      } else {
+        return helper.response(response, 400, 'Email is not registered !')
+      }
+    } catch (error) {
+      return helper.response(response, 400, 'Bad Request', error)
+    }
+  },
+  activationUser: async (request, response) => {
+    try {
+      const { keys } = request.query;
+      const checkDataUser = await checkKey(keys);
+      if (
+        request.query.keys === undefined ||
+        request.query.keys === null ||
+        request.query.keys === ""
+      ) {
+        return helper.response(response, 400, "Invalid Key");
+      }
+      if (checkDataUser.length > 0) {
+        const email = checkDataUser[0].user_email
+        let setData = {
+          user_key: '',
+          user_status: 1,
+          user_updated_at: new Date(),
+        };
+        const result = await changePassword(setData, email);
+        return helper.response(response, 200, "Success Activate Account", result);
+      } else {
+        return helper.response(response, 400, `Invalid key`);
       }
     } catch (error) {
       return helper.response(response, 404, "Bad Request", error);

@@ -1,6 +1,8 @@
 const router = require('express').Router()
-const { loginUser, regWorker, regRecruiter, forgotPassword, changePassword } = require('../controller/users')
+const { getAllUser, getUserById, loginUser, regWorker, regRecruiter, forgotPassword, changePassword } = require('../controller/users')
 
+router.get("/user/", getAllUser);
+router.get("/user/:id", getUserById);
 router.post('/login', loginUser)
 router.post('/register/worker', regWorker)
 router.post('/register/recruiter', regRecruiter)

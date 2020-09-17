@@ -1,6 +1,25 @@
 const connection = require("../config/mysql");
 
 module.exports = {
+  getAllUser: (sort, limit, offset) => {
+    return new Promise((resolve, reject) => {
+      connection.query(`SELECT * FROM user ORDER BY ${sort} LIMIT ? OFFSET ?`, 
+      [limit, offset], (error, result) => {
+        !error ? resolve(result) : reject(new Error(error));
+      });
+    });
+  },
+  getUserById: (id) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        "SELECT * FROM user WHERE user_id = ?",
+        id,
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error));
+        }
+      );
+    });
+  },
   postUser: (setData) => {
     return new Promise((resolve, reject) => {
       connection.query("INSERT INTO user SET ?", setData, (error, result) => {

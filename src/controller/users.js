@@ -2,9 +2,58 @@ const bcrypt = require('bcrypt')
 const helper = require('../helper')
 const jwt = require('jsonwebtoken')
 const nodemailer = require("nodemailer");
-const { postUser, checkUser, checkKey, changePassword } = require("../model/users");
+const { getAllUser, getUserById, postUser, checkUser, checkKey, changePassword } = require("../model/users");
 
 module.exports = {
+  getAllUser: async (request, response) => {
+    let { sort, page, limit } = request.query;
+    if (sort === undefined || sort === null || sort === "") {
+      sort = `user_id`;
+    }
+    if (page === undefined || page === null || page === "") {
+      page = parseInt(1);
+    } else {
+      page = parseInt(page);
+    }
+    if (limit === undefined || limit === null || limit === "") {
+      limit = parseInt(9);
+    } else {
+      limit = parseInt(limit);
+    }
+    let totalData = await getProductCount();
+    let totalPage = Math.ceil(totalData / limit);
+    let limits = page * limit;
+    let offset = page * limit - limit;
+    let prevLink = getPrevLink(page, request.query);
+    let nextLink = getNextLink(page, totalPage, request.query);
+    const pageInfo = {
+      page,
+      totalPage,
+      limit,
+      totalData,
+      prevLink: prevLink && `http://127.0.0.1:3001/product?${prevLink}`,
+      nextLink: nextLink && `http://127.0.0.1:3001/product?${nextLink}`,
+    };
+    try {
+      const result = await getAllUser(sort, limit, offset);
+      return helper.response(response, 200, "Success Get All User", result, pageInfo);
+    } catch (error) {
+      return helper.response(response, 400, "Bad Request", error);
+    }
+  },
+  getUserById: async (request, response) => {
+    try {
+      const { id } = request.params;
+      const result = await getUserById(id);
+      if (result.length > 0) {
+        return helper.response(response, 200, "Success Get User By Id", result);
+      } else {
+        return helper.response(response, 404, `User By Id: ${id} Not Found`);
+      }
+    } catch (error) {
+      return helper.response(response, 400, "Bad Request", error);
+    }
+  },
   regWorker: async (request, response) => {
     const salt = bcrypt.genSaltSync(8);
     const encryptPassword = bcrypt.hashSync(request.body.user_password, salt);
@@ -148,7 +197,10 @@ module.exports = {
           from: '"Vacatech"',
           to: user_email,
           subject: "Vacatech - Forgot Password",
-          html: `<a href="http://localhost:8080/changePassword?keys=${keys}">Click Here To Change Password</a>`,
+          html: 
+          `<h1>Request to Reset Your Account Password</h1>
+          <p>The following is the button for you to reset the password.</p>
+          <a href="http://localhost:8080/changePassword?keys=${keys}">Change Password</a>`,
         }),
         function (error) {
           if (error) {
@@ -173,7 +225,7 @@ module.exports = {
         request.query.keys === null ||
         request.query.keys === ""
       ) {
-        return helper.response(response, 400, "Key Not Found !");
+        return helper.response(response, 400, "Wrong key !");
       }
       if (checkDataUser.length > 0) {
         const email = checkDataUser[0].user_email
@@ -210,8 +262,6 @@ module.exports = {
           return helper.response(response, 400, "Password must be 8-16 characters")
         }else if (request.body.confirm_password !== request.body.user_password) {
           return helper.response(response, 400, "Password didn't match");
-        } else if (setData.user_key !== checkDataUser[0].user_key){
-          return helper.response(response, 400, "Wrong key !")
         } else {
           const salt = bcrypt.genSaltSync(10);
           const encryptPassword = bcrypt.hashSync(user_password, salt);

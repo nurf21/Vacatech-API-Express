@@ -1,8 +1,8 @@
 const bcrypt = require('bcrypt')
-const helper = require('../helper/index')
+const helper = require('../helper')
 const jwt = require('jsonwebtoken')
 const nodemailer = require("nodemailer");
-const { postUser, checkUser, changePassword } = require("../model/users");
+const { postUser, checkUser, checkKey, changePassword } = require("../model/users");
 
 module.exports = {
   regWorker: async (request, response) => {
@@ -25,21 +25,11 @@ module.exports = {
       if (!setData.user_email.match("@")) {
         return helper.response(response, 400, "Invalid missing character");
       } else if (checkEmail.length > 0) {
-        return helper.response(response, 400, "Email is already registered");
-      } else if (
-        setData.user_phone.length < 10 ||
-        setData.user_phone.length < 13
-      ) {
-        return helper.response(response, 400, "Invalid phone number");
-      } else if (
-        request.body.user_password.length < 8 ||
-        request.body.user_password.length > 16
-      ) {
-        return helper.response(
-          response,
-          400,
-          "Password must be 8-16 characters"
-        );
+        return helper.response(response, 400, 'Email is already registered')
+      } else if (setData.user_phone.length < 10 || setData.user_phone.length > 13) {
+        return helper.response(response, 400, 'Invalid phone number')
+      } else if (request.body.user_password.length < 8 || request.body.user_password.length > 16) {
+        return helper.response(response, 400, 'Password must be 8-16 characters')
       } else if (request.body.confirm_password !== request.body.user_password) {
         return helper.response(response, 400, "Password didn't match");
       } else {
@@ -145,41 +135,50 @@ module.exports = {
           user_updated_at: new Date()
         }
         await changePassword(data, user_email)
-        let transporter = nodemailer.createTransport({
-          host: "smtp.gmail.com",
+        const transporter = nodemailer.createTransport({
+          host: 'smtp.gmail.com',
           port: 465,
           secure: true,
           auth: {
             user: process.env.USER,
-            pass: process.env.PASS,
-          },
-        });
+            pass: process.env.PASS
+          }
+        })
         await transporter.sendMail({
           from: '"Vacatech"',
           to: user_email,
           subject: "Vacatech - Forgot Password",
-          html: `Your code is <b>${keys}</b>`,
+          html: `<a href="http://localhost:8080/changePassword?keys=${keys}">Click Here To Change Password</a>`,
         }),
-          function (error) {
-            if (error) {
-              return helper.response(response, 400, "Email not send !");
-            } 
-          };
-        return helper.response(response, 200, "Email has been send !");
-      }else {
-        return helper.response(response, 400, "Email is not Registered !");
+        function (error) {
+          if (error) {
+            return helper.response(response, 400, 'Email not sent !')
+          }
+        }
+        return helper.response(response, 200, 'Email has been sent !')
+      } else {
+        return helper.response(response, 400, 'Email is not Registered !')
       }
     } catch (error) {
-      return helper.response(response, 400, "Bad Request", error);
+      return helper.response(response, 400, 'Bad Request', error)
     }
   },
   changePassword: async (request, response) => {
     try {
-      const { user_email, user_key, user_password } = request.body;
-      const checkDataUser = await checkUser(user_email);
+      const { keys } = request.query;
+      const { user_password } = request.body;
+      const checkDataUser = await checkKey(keys);
+      if (
+        request.query.keys === undefined ||
+        request.query.keys === null ||
+        request.query.keys === ""
+      ) {
+        return helper.response(response, 400, "Key Not Found !");
+      }
       if (checkDataUser.length > 0) {
+        const email = checkDataUser[0].user_email
         let setData = {
-          user_key,
+          user_key:keys,
           user_password,
           user_updated_at: new Date(),
         };
@@ -190,14 +189,8 @@ module.exports = {
             user_key: "",
             user_updated_at: new Date()
            }
-           await changePassword(data, user_email)
+           await changePassword(data, email)
            return helper.response(response, 400, "Key has expired")
-        } else if (
-          request.body.user_key === undefined ||
-          request.body.user_key === null ||
-          request.body.user_key === ""
-        ) {
-          return helper.response(response, 400, "Key must be filled !");
         } else if (
           request.body.user_password === undefined ||
           request.body.user_password === null ||
@@ -225,10 +218,10 @@ module.exports = {
           setData.user_password = encryptPassword;
           setData.user_key = ""
         }
-        const result = await changePassword(setData, user_email);
+        const result = await changePassword(setData, email);
         return helper.response(response, 200, "Success Password Updated", result);
       } else {
-        return helper.response(response, 404, `User By email: ${user_email} Not Found`);
+        return helper.response(response, 404, `Key Not Found !`);
       }
     } catch (error) {
       return helper.response(response, 404, "Bad Request", error);

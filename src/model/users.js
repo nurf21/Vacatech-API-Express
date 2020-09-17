@@ -25,26 +25,37 @@ module.exports = {
         (error, result) => {
           !error ? resolve(result) : reject(new Error(error));
         }
-      );
-    });
+      )
+    })
+  },
+  checkKey: (keys) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        "SELECT * FROM user WHERE user_key = ?",
+        keys, 
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
   },
   changePassword: (setData, email) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        "UPDATE user SET ? WHERE user_email = ?",
+        'UPDATE user SET ? WHERE user_email = ?',
         [setData, email],
         (error, result) => {
           if (!error) {
             const newResult = {
               user_email: email,
-              ...setData,
-            };
-            resolve(newResult);
+              ...setData
+            }
+            resolve(newResult)
           } else {
-            reject(new Error(error));
+            reject(new Error(error))
           }
         }
-      );
-    });
-  },
-};
+      )
+    })
+  }
+}

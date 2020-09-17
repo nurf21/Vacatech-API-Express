@@ -26,7 +26,7 @@ module.exports = {
         return helper.response(response, 400, 'Invalid missing character')
       } else if (checkEmail.length > 0) {
         return helper.response(response, 400, 'Email is already registered')
-      } else if (setData.user_phone.length < 10 || setData.user_phone.length < 13) {
+      } else if (setData.user_phone.length < 10 || setData.user_phone.length > 13) {
         return helper.response(response, 400, 'Invalid phone number')
       } else if (request.body.user_password.length < 8 || request.body.user_password.length > 16) {
         return helper.response(response, 400, 'Password must be 8-16 characters')

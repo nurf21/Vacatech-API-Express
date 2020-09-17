@@ -43,10 +43,10 @@ module.exports = {
             const newResult = {
               profile_id: result.insertId,
               ...setData,
-            };
-            resolve(newResult)
+            }
+            resolve(newResult);
           } else {
-            reject(new Error(error))
+            reject(new Error(error));
           }
         }
       )
@@ -62,10 +62,10 @@ module.exports = {
             const newResult = {
               profile_id: id,
               ...setData,
-            };
-            resolve(newResult)
+            }
+            resolve(newResult);
           } else {
-            reject(new Error(error))
+            reject(new Error(error));
           }
         }
       )
@@ -80,10 +80,10 @@ module.exports = {
           if (!error) {
             const newResult = {
               id: id,
-            };
-            resolve(newResult)
+            }
+            resolve(newResult);
           } else {
-            reject(new Error(error))
+            reject(new Error(error));
           }
         }
       )

@@ -1,6 +1,24 @@
-const connection = require("../config/mysql");
+const connection = require("../config/mysql")
 
 module.exports = {
+  getAllUsers: () => {
+    return new Promise((resolve, reject) => {
+      connection.query("SELECT * FROM user", (error, result) => {
+        !error ? resolve(result) : reject(new Error(error))
+      })
+    })
+  },
+  getUsersById: (id) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        "SELECT * FROM user WHERE user_id = ?",
+        id,
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
+  },
   postUser: (setData) => {
     return new Promise((resolve, reject) => {
       connection.query("INSERT INTO user SET ?", setData, (error, result) => {
@@ -9,13 +27,13 @@ module.exports = {
             id: result.insertId,
             ...setData,
           };
-          delete newResult.user_password;
-          resolve(newResult);
+          delete newResult.user_password
+          resolve(newResult)
         } else {
-          resolve(new Error(error));
+          resolve(new Error(error))
         }
-      });
-    });
+      })
+    })
   },
   checkUser: (email) => {
     return new Promise((resolve, reject) => {
@@ -23,7 +41,7 @@ module.exports = {
         "SELECT * FROM user WHERE user_email = ?",
         email,
         (error, result) => {
-          !error ? resolve(result) : reject(new Error(error));
+          !error ? resolve(result) : reject(new Error(error))
         }
       )
     })
@@ -32,7 +50,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       connection.query(
         "SELECT * FROM user WHERE user_key = ?",
-        keys, 
+        keys,
         (error, result) => {
           !error ? resolve(result) : reject(new Error(error))
         }
@@ -42,13 +60,13 @@ module.exports = {
   changePassword: (setData, email) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        'UPDATE user SET ? WHERE user_email = ?',
+        "UPDATE user SET ? WHERE user_email = ?",
         [setData, email],
         (error, result) => {
           if (!error) {
             const newResult = {
               user_email: email,
-              ...setData
+              ...setData,
             }
             resolve(newResult)
           } else {
@@ -57,5 +75,5 @@ module.exports = {
         }
       )
     })
-  }
+  },
 }

@@ -3,7 +3,7 @@ const connection = require("../config/mysql")
 module.exports = {
   getAllWorker: (sort, limit, offset) => {
     return new Promise((resolve, reject) => {
-      connection.query(`SELECT * FROM user WHERE user_status = 1 AND user_role = 1 ORDER BY ${sort} LIMIT ? OFFSET ?`, [limit, offset], (error, result) => {
+      connection.query(`SELECT * FROM user JOIN profile ON user.user_id = profile.user_id WHERE user.user_status = 1 AND user.user_role = 1 ${sort} LIMIT ? OFFSET ?`, [limit, offset], (error, result) => {
         if(!error) {
           result.map(value => {
             delete value.user_password
@@ -16,9 +16,9 @@ module.exports = {
       })
     })
   },
-  getCountWorker: () => {
+  getCountWorker: (sort) => {
     return new Promise((resolve, reject) => {
-      connection.query('SELECT COUNT(*) as total FROM user WHERE user_status = 1 AND user_role = 1', (error, result) => {
+      connection.query(`SELECT COUNT(*) as total FROM user JOIN profile ON user.user_id = profile.user_id WHERE user.user_status = 1 AND user.user_role = 1 ${sort}`, (error, result) => {
         !error ? resolve(result[0].total) : reject(new Error(error))
       })
     })

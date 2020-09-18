@@ -53,8 +53,8 @@ module.exports = {
     let { page, limit, sort } = request.query
     page === undefined || page === '' ? (page = 1) : (page = parseInt(page))
     limit === undefined || limit === '' ? (limit = 6) : (limit = parseInt(limit))
-    const totalData = await getCountWorker()
-    if (sort === undefined || sort === '') {
+    const totalData = await getCountWorker(sort)
+    if (sort === undefined || sort === null) {
       sort = 'user_id'
     }
     const totalPage = Math.ceil(totalData / limit)
@@ -73,7 +73,6 @@ module.exports = {
       }
       return helper.response(response, 200, 'Success Get Worker', result, pageInfo)
     } catch (error) {
-      console.log(error)
       return helper.response(response, 400, 'Bad Request', error)
     }
   },

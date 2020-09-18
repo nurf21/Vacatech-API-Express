@@ -1,13 +1,12 @@
 const {
   getProfile,
-  getProfileById,
+  getProfileCompanyById,
   getProfileCount,
   postProfile,
   patchProfile,
   deleteProfile,
 } = require("../model/profile")
 const helper = require("../helper/index")
-const { request, response } = require("express")
 const qs = require("querystring")
 
 const getPrevLink = (page, currentQuery) => {
@@ -101,11 +100,10 @@ module.exports = {
       return helper.response(response, 400, "Bad Request", error)
     }
   },
-  getProfileById: async (request, response) => {
+  getProfileCompanyById: async (request, response) => {
     try {
       const { id } = request.params;
-      const result = await getProfileById(id)
-
+      const result = await getProfileCompanyById(id)
       if (result.length > 0) {
         return helper.response(
           response,

@@ -22,10 +22,10 @@ module.exports = {
       )
     })
   },
-  getProfileById: (id) => {
+  getProfileCompanyById: (id) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        "SELECT * FROM profile WHERE profile_id = ?",
+        "SELECT * FROM company_profile WHERE user_id = ?",
         id,
         (error, result) => {
           !error ? resolve(result) : reject(new Error(error))
@@ -37,6 +37,25 @@ module.exports = {
     return new Promise((resolve, reject) => {
       connection.query(
         "INSERT INTO profile SET ?",
+        setData,
+        (error, result) => {
+          if (!error) {
+            const newResult = {
+              profile_id: result.insertId,
+              ...setData,
+            }
+            resolve(newResult);
+          } else {
+            reject(new Error(error));
+          }
+        }
+      )
+    })
+  },
+  postProfileCompany: (setData) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        "INSERT INTO company_profile SET ?",
         setData,
         (error, result) => {
           if (!error) {

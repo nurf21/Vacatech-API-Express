@@ -3,7 +3,6 @@ const helper = require('../helper')
 const jwt = require('jsonwebtoken')
 const nodemailer = require("nodemailer");
 const { getAllUsers, getUserCount, getUsersById, getUsersByName, postUser, checkUser, checkKey, changePassword } = require("../model/users");
-const { getUserBySkill } = require("../model/skill")
 
 module.exports = {
   getAllUsers: async (request, response) => {
@@ -83,7 +82,6 @@ module.exports = {
       user_email: request.body.user_email,
       user_password: encryptPassword,
       user_name: request.body.user_name,
-      user_img: "blank-profile.jpg",
       user_role: 1,
       user_phone: request.body.user_phone,
       company_name: "",
@@ -92,29 +90,27 @@ module.exports = {
       user_status: 0,
     }
     try {
-      if (!setData.user_email.match("@")) {
-        return helper.response(response, 400, "Invalid missing character")
-      } else if (checkEmail.length > 0) {
+      if (checkEmail.length > 0) {
         return helper.response(response, 400, "Email is already registered")
-      } else if (
-        setData.user_phone.length < 10 ||
-        setData.user_phone.length > 13
-      ) {
+      } else if (setData.user_phone.length < 10 || setData.user_phone.length > 13) {
         return helper.response(response, 400, "Invalid phone number")
-      } else if (
-        request.body.user_password.length < 8 ||
-        request.body.user_password.length > 16
-      ) {
-        return helper.response(
-          response,
-          400,
-          "Password must be 8-16 characters"
-        );
+      } else if (request.body.user_password.length < 8 || request.body.user_password.length > 16) {
+        return helper.response(response, 400, "Password must be 8-16 characters")
       } else if (request.body.confirm_password !== request.body.user_password) {
         return helper.response(response, 400, "Password didn't match")
       } else {
-        const result = await postUser(setData);
-        return helper.response(response, 200, "Success Register User", result)
+        const result = await postUser(setData)
+        const setData2 = {
+          user_id: result.id,
+          profile_img: 'blank-profile.jpg',
+          profile_job: '',
+          profile_address: '',
+          job_address: '',
+          profile_desc: '',
+          profile_created_at: new Date(),
+        }
+        const result2 = await postProfile(setData2)
+        return helper.response(response, 200, "Success Register User")
       }
     } catch (error) {
       return helper.response(response, 400, "Bad Request")
@@ -128,7 +124,6 @@ module.exports = {
       user_email: request.body.user_email,
       user_password: encryptPassword,
       user_name: request.body.user_name,
-      user_img: "blank-profile.jpg",
       user_role: 2,
       user_phone: request.body.user_phone,
       company_name: request.body.company_name,
@@ -137,31 +132,31 @@ module.exports = {
       user_status: 0,
     }
     try {
-      if (!setData.user_email.match("@")) {
-        return helper.response(response, 400, "Invalid missing character")
-      } else if (checkEmail.length > 0) {
+      if (checkEmail.length > 0) {
         return helper.response(response, 400, "Email is already registered")
-      } else if (
-        setData.user_phone.length < 10 ||
-        setData.user_phone.length > 13
-      ) {
+      } else if (setData.user_phone.length < 10 || setData.user_phone.length > 13) {
         return helper.response(response, 400, "Invalid phone number")
-      } else if (
-        request.body.user_password.length < 8 ||
-        request.body.user_password.length > 16
-      ) {
-        return helper.response(
-          response,
-          400,
-          "Password must be 8-16 characters"
-        )
+      } else if (request.body.user_password.length < 8 || request.body.user_password.length > 16) {
+        return helper.response(response, 400, "Password must be 8-16 characters")
       } else if (request.body.confirm_password !== request.body.user_password) {
         return helper.response(response, 400, "Password didn't match")
       } else {
         const result = await postUser(setData)
-        return helper.response(response, 200, "Success Register User", result)
+        const setData2 = {
+          user_id: result.id,
+          profile_img: 'blank-profile.jpg',
+          profile_field: '',
+          profile_city: '',
+          profile_desc: '',
+          profile_instagram: '',
+          profile_linkedin: '',
+          profile_created_at: new Date(),
+        }
+        const result2 = await postProfileCompany(setData2)
+        return helper.response(response, 200, "Success Register User")
       }
     } catch (error) {
+      console.log(error)
       return helper.response(response, 400, "Bad Request")
     }
   },
@@ -241,10 +236,7 @@ module.exports = {
           from: '"Vacatech"',
           to: user_email,
           subject: "Vacatech - Forgot Password",
-          html: 
-          `<h1>Request to Reset Your Account Password</h1>
-          <p>The following is the button for you to reset the password.</p>
-          <a href="http://localhost:8080/changePassword?keys=${keys}">Change Password</a>`,
+          html: `<a href="http://localhost:8080/setpassword?keys=${keys}">Click Here To Change Password</a>`,
         }),
           function (error) {
             if (error) {
@@ -253,7 +245,7 @@ module.exports = {
           };
         return helper.response(response, 200, "Email has been sent !")
       } else {
-        return helper.response(response, 400, "Email is not Registered !")
+        return helper.response(response, 400, 'Email is not registered !')
       }
     } catch (error) {
       return helper.response(response, 400, "Bad Request", error)
@@ -269,7 +261,7 @@ module.exports = {
         request.query.keys === null ||
         request.query.keys === ""
       ) {
-        return helper.response(response, 400, "Wrong key !");
+        return helper.response(response, 400, "Invalid Key");
       }
       if (checkDataUser.length > 0) {
         const email = checkDataUser[0].user_email
@@ -325,7 +317,73 @@ module.exports = {
           result
         );
       } else {
-        return helper.response(response, 404, `Key Not Found !`)
+        return helper.response(response, 404, `Invalid key`);
+      }
+    } catch (error) {
+      return helper.response(response, 404, "Bad Request", error);
+    }
+  },
+  activationEmail: async (request, response) => {
+    try {
+      const { user_email } = request.body;
+      const keys = Math.round(Math.random() * 100000);
+      const checkDataUser = await checkUser(user_email);
+      if (checkDataUser.length >= 1) {
+        const data = {
+          user_key: keys,
+          user_updated_at: new Date()
+        }
+        await changePassword(data, user_email)
+        const transporter = nodemailer.createTransport({
+          host: 'smtp.gmail.com',
+          port: 465,
+          secure: true,
+          auth: {
+            user: process.env.USER,
+            pass: process.env.PASS
+          }
+        })
+        await transporter.sendMail({
+          from: '"Vacatech"',
+          to: user_email,
+          subject: "Vacatech - Activation Email",
+          html: `<a href="http://localhost:8080/activate?keys=${keys}">Click Here To Activate Your Account</a>`,
+        }),
+        function (error) {
+          if (error) {
+            return helper.response(response, 400, 'Email not sent !')
+          }
+        }
+        return helper.response(response, 200, 'Email has been sent !')
+      } else {
+        return helper.response(response, 400, 'Email is not registered !')
+      }
+    } catch (error) {
+      return helper.response(response, 400, 'Bad Request', error)
+    }
+  },
+  activationUser: async (request, response) => {
+    try {
+      const { keys } = request.query;
+      const checkDataUser = await checkKey(keys);
+      if (
+        request.query.keys === undefined ||
+        request.query.keys === null ||
+        request.query.keys === ""
+      ) {
+        return helper.response(response, 400, "Invalid Key");
+      }
+      if (checkDataUser.length > 0) {
+        const email = checkDataUser[0].user_email
+        let setData = {
+          user_key: '',
+          user_status: 1,
+          user_updated_at: new Date(),
+        };
+        const result = await changePassword(setData, email);
+        return helper.response(response, 200, "Success Activate Account", result);
+      } else {
+        return helper.response(response, 400, `Invalid key`);
       }
     } catch (error) {
       return helper.response(response, 404, "Bad Request", error)

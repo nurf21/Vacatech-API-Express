@@ -41,7 +41,6 @@ module.exports = {
       );
     });
   },
-  
   postUser: (setData) => {
     return new Promise((resolve, reject) => {
       connection.query("INSERT INTO user SET ?", setData, (error, result) => {

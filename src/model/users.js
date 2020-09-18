@@ -1,15 +1,36 @@
-const connection = require("../config/mysql");
+const connection = require("../config/mysql")
 
 module.exports = {
-  getAllUser: (sort, limit, offset) => {
+  getUserCount: () => {
     return new Promise((resolve, reject) => {
-      connection.query(`SELECT * FROM user ORDER BY ${sort} LIMIT ? OFFSET ?`, 
+      connection.query(
+        "SELECT COUNT(*) as total FROM user ",
+        (error, result) => {
+          !error ? resolve(result[0].total) : reject(new Error(error));
+        }
+      );
+    });
+  },
+  getAllUsers: (sort, limit, offset) => {
+    return new Promise((resolve, reject) => {
+      connection.query(`SELECT * FROM user LEFT JOIN profile ON user.user_id = profile.user_id LEFT JOIN skill ON user.user_id = skill.user_id LEFT JOIN portfolio ON user.user_id = portfolio.user_id ORDER BY ${sort} LIMIT ? OFFSET ?`, 
       [limit, offset], (error, result) => {
         !error ? resolve(result) : reject(new Error(error));
       });
     });
   },
-  getUserById: (id) => {
+  getUsersByName: (search, limit, offset) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        `SELECT * FROM user LEFT JOIN profile ON user.user_id = profile.user_id LEFT JOIN skill ON user.user_id = skill.user_id LEFT JOIN portfolio ON user.user_id = portfolio.user_id WHERE skill_name LIKE ? LIMIT ? OFFSET ?`,
+        [search, limit, offset],
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error));
+        }
+      );
+    });
+  },
+  getUsersById: (id) => {
     return new Promise((resolve, reject) => {
       connection.query(
         "SELECT * FROM user WHERE user_id = ?",
@@ -20,6 +41,7 @@ module.exports = {
       );
     });
   },
+  
   postUser: (setData) => {
     return new Promise((resolve, reject) => {
       connection.query("INSERT INTO user SET ?", setData, (error, result) => {
@@ -28,13 +50,13 @@ module.exports = {
             id: result.insertId,
             ...setData,
           };
-          delete newResult.user_password;
-          resolve(newResult);
+          delete newResult.user_password
+          resolve(newResult)
         } else {
-          resolve(new Error(error));
+          resolve(new Error(error))
         }
-      });
-    });
+      })
+    })
   },
   checkUser: (email) => {
     return new Promise((resolve, reject) => {
@@ -42,7 +64,7 @@ module.exports = {
         "SELECT * FROM user WHERE user_email = ?",
         email,
         (error, result) => {
-          !error ? resolve(result) : reject(new Error(error));
+          !error ? resolve(result) : reject(new Error(error))
         }
       )
     })
@@ -51,7 +73,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       connection.query(
         "SELECT * FROM user WHERE user_key = ?",
-        keys, 
+        keys,
         (error, result) => {
           !error ? resolve(result) : reject(new Error(error))
         }
@@ -61,13 +83,13 @@ module.exports = {
   changePassword: (setData, email) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        'UPDATE user SET ? WHERE user_email = ?',
+        "UPDATE user SET ? WHERE user_email = ?",
         [setData, email],
         (error, result) => {
           if (!error) {
             const newResult = {
               user_email: email,
-              ...setData
+              ...setData,
             }
             resolve(newResult)
           } else {
@@ -76,5 +98,5 @@ module.exports = {
         }
       )
     })
-  }
+  },
 }

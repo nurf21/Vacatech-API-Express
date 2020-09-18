@@ -1,13 +1,12 @@
 const {
   getProfile,
-  getProfileById,
+  getProfileCompanyById,
   getProfileCount,
   postProfile,
   patchProfile,
   deleteProfile,
 } = require("../model/profile")
 const helper = require("../helper/index")
-const { request, response } = require("express")
 const qs = require("querystring")
 
 const getPrevLink = (page, currentQuery) => {
@@ -20,19 +19,19 @@ const getPrevLink = (page, currentQuery) => {
   } else {
     return null
   }
-};
+}
 
 const getNextLink = (page, totalPage, currentQuery) => {
   if (page < totalPage) {
     const generatePage = {
       page: page + 1,
-    };
-    const resultNextLink = { ...currentQuery, ...generatePage };
+    }
+    const resultNextLink = { ...currentQuery, ...generatePage }
     return qs.stringify(resultNextLink);
   } else {
-    return null
+    return null;
   }
-};
+}
 
 module.exports = {
   getAllProfile: async (request, response) => {
@@ -47,7 +46,7 @@ module.exports = {
       sort = `profile_id`
     }
     if (page === undefined || page === "") {
-      page = parseInt(1);
+      page = parseInt(1)
     } else {
       page = parseInt(page)
     }
@@ -71,14 +70,14 @@ module.exports = {
       totalData,
       prevLink: prevLink && `http://127.0.0.1:3001/profile? ${prevLink}`,
       nextLink: nextLink && `http://127.0.0.1:3001/profile? ${nextLink}`,
-    };
+    }
     try {
-      const result = await getProfile(search, sort, limit, offset)
+      const result = await getProfile(search, sort, limit, offset);
       if (result.length > 0) {
         const newResult = {
           data: result,
           page: pageInfo,
-        };
+        }
 
         return helper.response(
           response,
@@ -86,7 +85,7 @@ module.exports = {
           "Succes get Profile",
           result,
           pageInfo
-        );
+        )
       } else {
         return helper.response(
           response,
@@ -94,34 +93,33 @@ module.exports = {
           "Profile not found",
           result,
           pageInfo
-        );
+        )
       }
     } catch (error) {
       //   console.log(error);
-        return helper.response(response, 400, "Bad Request", error);
+      return helper.response(response, 400, "Bad Request", error)
     }
   },
-  getProfileById: async (request, response) => {
+  getProfileCompanyById: async (request, response) => {
     try {
-      const { id } = request.params
-      const result = await getProfileById(id)
-
+      const { id } = request.params;
+      const result = await getProfileCompanyById(id)
       if (result.length > 0) {
         return helper.response(
           response,
           200,
           "Succes get profile By Id",
           result
-        );
+        )
       } else {
         return helper.response(
           response,
           404,
           `Profile By Id : ${id} Not Found`
-        );
+        )
       }
     } catch (error) {
-      return helper.response(response, 400, "Bad Request", error)
+      return helper.response(response, 400, "Bad Request", error);
     }
   },
   postProfile: async (request, response) => {
@@ -132,7 +130,7 @@ module.exports = {
         profile_address,
         job_address,
         profile_desc,
-      } = request.body
+      } = request.body;
       const setData = {
         profile_name,
         profile_job,
@@ -140,7 +138,7 @@ module.exports = {
         job_address,
         profile_desc,
         profile_created_at: new Date(),
-      };
+      }
       if (setData.profile_name === "") {
         return helper.response(response, 404, ` Input name!`)
       } else if (setData.profile_job === "") {
@@ -160,7 +158,7 @@ module.exports = {
   },
   patchProfile: async (request, response) => {
     try {
-      const { id } = request.params;
+      const { id } = request.params
       const {
         profile_name,
         profile_job,
@@ -175,7 +173,7 @@ module.exports = {
         job_address,
         profile_desc,
         profile_updated_at: new Date(),
-      };
+      }
       if (setData.profile_name === "") {
         return helper.response(response, 404, ` Input your Name!`)
       } else if (setData.profile_job === "") {
@@ -195,7 +193,7 @@ module.exports = {
   },
   deleteProfile: async (request, response) => {
     try {
-      const { id } = request.params
+      const { id } = request.params;
       const result = await deleteProfile(id)
       return helper.response(response, 200, "Delete Done", result)
     } catch (error) {

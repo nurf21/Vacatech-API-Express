@@ -1,14 +1,14 @@
 const router = require("express").Router()
 const {
   getAllProfile,
-  getProfileById,
+  getProfileCompanyById,
   postProfile,
   patchProfile,
   deleteProfile,
 } = require("../controller/profile")
 
 router.get("/", getAllProfile)
-router.get("/:id", getProfileById)
+router.get("/company/:id", getProfileCompanyById)
 
 router.post("/", postProfile)
 

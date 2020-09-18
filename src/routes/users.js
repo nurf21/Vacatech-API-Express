@@ -9,4 +9,10 @@ router.post('/forgot', forgotPassword)
 router.patch('/change', changePassword)
 router.patch('/activate', activationUser)
 
-module.exports = router;
+router.post("/login", loginUser)
+router.post("/register/worker", regWorker)
+router.post("/register/recruiter", regRecruiter)
+router.post("/forgot", forgotPassword)
+router.patch("/change", changePassword)
+
+module.exports = router

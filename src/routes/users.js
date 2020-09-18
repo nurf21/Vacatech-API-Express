@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const { 
-  // getAllWorker, 
+  getAllWorker, 
   getAllUsers,
   getAllUserByName, 
   loginUser, 
@@ -12,7 +12,7 @@ const {
   activationUser 
 } = require('../controller/users')
 
-// router.get('/worker', getAllWorker)
+router.get('/worker', getAllWorker)
 
 router.get("/", getAllUsers)
 router.get("/search", getAllUserByName)

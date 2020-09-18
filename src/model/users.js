@@ -1,28 +1,28 @@
 const connection = require("../config/mysql")
 
 module.exports = {
-  // getAllWorker: (sort, limit, offset) => {
-  //   return new Promise((resolve, reject) => {
-  //     connection.query(`SELECT * FROM user WHERE user_status = 1 AND user_role = 1 ORDER BY ${sort} LIMIT ? OFFSET ?`, [limit, offset], (error, result) => {
-  //       if(!error) {
-  //         result.map(value => {
-  //           delete value.user_password
-  //           delete value.user_key
-  //         })
-  //         resolve(result)
-  //       } else {
-  //         reject(new Error(error))
-  //       }
-  //     })
-  //   })
-  // },
-  // getCountWorker: () => {
-  //   return new Promise((resolve, reject) => {
-  //     connection.query('SELECT COUNT(*) as total FROM user WHERE user_status = 1 AND user_role = 1', (error, result) => {
-  //       !error ? resolve(result[0].total) : reject(new Error(error))
-  //     })
-  //   })
-  // },
+  getAllWorker: (sort, limit, offset) => {
+    return new Promise((resolve, reject) => {
+      connection.query(`SELECT * FROM user WHERE user_status = 1 AND user_role = 1 ORDER BY ${sort} LIMIT ? OFFSET ?`, [limit, offset], (error, result) => {
+        if(!error) {
+          result.map(value => {
+            delete value.user_password
+            delete value.user_key
+          })
+          resolve(result)
+        } else {
+          reject(new Error(error))
+        }
+      })
+    })
+  },
+  getCountWorker: () => {
+    return new Promise((resolve, reject) => {
+      connection.query('SELECT COUNT(*) as total FROM user WHERE user_status = 1 AND user_role = 1', (error, result) => {
+        !error ? resolve(result[0].total) : reject(new Error(error))
+      })
+    })
+  },
   getAllUsers: (sort, limit, offset) => {
     return new Promise((resolve, reject) => {
       connection.query(`SELECT * FROM user LEFT JOIN profile ON user.user_id = profile.user_id LEFT JOIN skill ON user.user_id = skill.user_id LEFT JOIN portfolio ON user.user_id = portfolio.user_id WHERE user_status = 1 AND user_role = 1 ORDER BY ${sort} LIMIT ? OFFSET ?`, 

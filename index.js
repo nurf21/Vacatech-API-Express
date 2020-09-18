@@ -21,7 +21,6 @@ app.use('/', routerNavigation)
 
 app.get('*', (request, response) => {
   response.status(404).send('Path not Found')
-  console.log(response)
 })
 
 app.listen(process.env.PORT, process.env.IP, () => {

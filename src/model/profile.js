@@ -33,6 +33,17 @@ module.exports = {
       )
     })
   },
+  getProfileWorkerById: (id) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        "SELECT * FROM profile WHERE user_id = ?",
+        id,
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
+  },
   postProfile: (setData) => {
     return new Promise((resolve, reject) => {
       connection.query(

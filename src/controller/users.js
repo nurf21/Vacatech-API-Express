@@ -1,39 +1,67 @@
-const bcrypt = require('bcrypt')
-const helper = require('../helper')
-const jwt = require('jsonwebtoken')
-const nodemailer = require("nodemailer");
-const { getAllUsers, getUserCount, getUsersById, getUsersByName, postUser, checkUser, checkKey, changePassword } = require("../model/users");
+const bcrypt = require("bcrypt")
+const helper = require("../helper")
+const jwt = require("jsonwebtoken")
+const nodemailer = require("nodemailer")
+const qs = require("querystring")
+const { getAllWorker, getUsersByName, postUser, checkUser, checkKey, changePassword, getCountWorker } = require("../model/users")
+const { postProfile, postProfileCompany, getProfileWorkerById } = require('../model/profile')
+const { getSkillById } = require("../model/skill")
+
+const getPrevLink = (page, currentQuery) => {
+  if (page > 1) {
+    const generatePage = {
+      page: page - 1,
+    };
+    const resultPrevLink = { ...currentQuery, ...generatePage }
+    return qs.stringify(resultPrevLink)
+  } else {
+    return null
+  }
+}
+
+const getNextLink = (page, totalPage, currentQuery) => {
+  if (page < totalPage) {
+    const generatePage = {
+      page: page + 1,
+    }
+    const resultNextLink = { ...currentQuery, ...generatePage }
+    return qs.stringify(resultNextLink);
+  } else {
+    return null;
+  }
+}
 
 module.exports = {
-  getAllUsers: async (request, response) => {
+  getAllWorker: async (request, response) => {
+    let { page, limit, sort } = request.query
+    page === undefined || page === '' ? (page = 1) : (page = parseInt(page))
+    limit === undefined || limit === '' ? (limit = 6) : (limit = parseInt(limit))
+    const totalData = await getCountWorker()
+    if (sort === undefined || sort === '') {
+      sort = 'user_id'
+    }
+    const totalPage = Math.ceil(totalData / limit)
+    const offset = page * limit - limit
+    const prevLink = getPrevLink(page, request.query)
+    const nextLink = getNextLink(page, totalPage, request.query)
+    const pageInfo = {
+      page,
+      totalPage,
+      limit,
+      totalData,
+      prevLink: prevLink && `http://127.0.0.1:3001/product?${prevLink}`,
+      nextLink: nextLink && `http://127.0.0.1:3001/product?${nextLink}`
+    }
     try {
-      let { sort, page, limit } = request.query;
-      if (sort === undefined || sort === null || sort === "") {
-        sort = `user.user_id`;
+      const result = await getAllWorker(sort, limit, offset)
+      for (let i = 0; i < result.length; i++) {
+        result[i].profile = await getProfileWorkerById(result[i].user_id)
+        result[i].skill = await getSkillById(result[i].user_id)
       }
-      if (page === undefined || page === null || page === "") {
-        page = parseInt(1);
-      } else {
-        page = parseInt(page);
-      }
-      if (limit === undefined || limit === null || limit === "") {
-        limit = parseInt(9);
-      } else {
-        limit = parseInt(limit);
-      }
-      let totalData = await getUserCount();
-      let totalPage = Math.ceil(totalData / limit);
-      let offset = page * limit - limit;
-      const pageInfo = {
-        page,
-        totalPage,
-        limit,
-        totalData,
-      };
-      const result = await getAllUsers(sort, limit, offset)
-      return helper.response(response, 200, "Success get Users", result, pageInfo)
+      return helper.response(response, 200, 'Success Get Worker', result, pageInfo)
     } catch (error) {
-      return helper.response(response, 400, "Bad Request", error)
+      console.log(error)
+      return helper.response(response, 400, 'Bad Request', error)
     }
   },
   getAllUserByName: async (request, response) => {
@@ -54,22 +82,6 @@ module.exports = {
         "Success Get Product Name",
         result
       );
-    } catch (error) {
-      return helper.response(response, 400, "Bad Request", error);
-    }
-  },
-  getUsersById: async (request, response) => {
-    try {
-      const { id } = request.params
-      const result = await getUsersById(id)
-      for (let i = 0; i < result.length; i++) {
-        result[i].skill = await getUserBySkill(result[i].user_id)
-      }
-      if (result.length > 0) {
-        return helper.response(response, 200, "Succes get User By Id", result);
-      } else {
-        return helper.response(response, 404, "Not Found")
-      }
     } catch (error) {
       return helper.response(response, 400, "Bad Request", error);
     }

@@ -1,9 +1,9 @@
 const router = require('express').Router()
-const { getAllUsers, getAllUserByName, getUsersById, loginUser, regWorker, regRecruiter, forgotPassword, changePassword, activationEmail, activationUser } = require('../controller/users')
+const { getAllWorker, getAllUserByName, loginUser, regWorker, regRecruiter, forgotPassword, changePassword, activationEmail, activationUser } = require('../controller/users')
 
-router.get("/", getAllUsers)
-router.get("/search", getAllUserByName);
-router.get("/:id", getUsersById)
+router.get('/worker', getAllWorker)
+
+router.get("/search", getAllUserByName)
 router.post('/login', loginUser)
 router.post('/register/worker', regWorker)
 router.post('/register/recruiter', regRecruiter)

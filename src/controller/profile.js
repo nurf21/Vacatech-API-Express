@@ -78,7 +78,6 @@ module.exports = {
           data: result,
           page: pageInfo,
         }
-
         return helper.response(
           response,
           200,
@@ -96,7 +95,7 @@ module.exports = {
         )
       }
     } catch (error) {
-      //   console.log(error);
+        console.log(error);
       return helper.response(response, 400, "Bad Request", error)
     }
   },

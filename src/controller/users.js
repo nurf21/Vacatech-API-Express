@@ -15,7 +15,7 @@ const {
   // getCountWorker 
 } = require("../model/users")
 // const { postProfile, postProfileCompany, getProfileWorkerById } = require('../model/profile')
-// const { getSkillById } = require("../model/skill")
+// const { getUserBySkill } = require("../model/skill")
 
 // const getPrevLink = (page, currentQuery) => {
 //   if (page > 1) {

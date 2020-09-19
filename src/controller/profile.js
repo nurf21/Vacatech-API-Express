@@ -196,7 +196,8 @@ module.exports = {
   patchProfile: async (request, response) => {
     try {
       const { id } = request.params;
-      const { user_id,
+      const { 
+        user_id,
         profile_name,
         profile_job,
         job_type,
@@ -209,7 +210,7 @@ module.exports = {
       if (request.body.user_id === "") {
         return helper.response(response, 404, ` Input id`)
       } else if (request.body.profile_name === "") {
-        return helper.response(response, 404, ` Input link`)
+        return helper.response(response, 404, ` Input your name`)
       } else {
         const checkId = await getProfileById(id)
         if (checkId.length > 0) {

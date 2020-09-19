@@ -14,7 +14,7 @@ router.get("/:id", getPortfolioById)
 
 //POST
 router.post("/", imageFolio, postPortfolio)
-router.patch("/:id", imageFolio,patchPortfolio)
+router.patch("/:id", imageFolio, patchPortfolio)
 
 //DELETE
 router.delete("/:id", deletePortfolio);

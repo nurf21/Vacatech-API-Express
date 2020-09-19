@@ -49,8 +49,7 @@ module.exports = {
         return helper.response(response, 201, "Skill Created", result);
       }
     } catch (error) {
-      console.log(error);
-      //   return helper.response(response, 400, "Bad Request", error);
+      return helper.response(response, 400, "Bad Request", error);
     }
   },
   patchSkill: async (request, response) => {

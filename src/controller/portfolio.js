@@ -25,12 +25,7 @@ module.exports = {
       const result = await getPortfolioById(id)
 
       if (result.length > 0) {
-        return helper.response(
-          response,
-          200,
-          "Succes get portfolio By Id",
-          result
-        )
+        return helper.response(response, 200, "Succes get portfolio By Id", result)
       } else {
         return helper.response(
           response,

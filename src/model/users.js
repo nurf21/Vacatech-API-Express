@@ -87,6 +87,19 @@ module.exports = {
       })
     })
   },
+  patchUser: (setData, id) => {
+    return new Promise((resolve, reject) => {
+      connection.query("UPDATE user SET ? WHERE user_id = ?", [setData, id],
+        (error, result) => {
+          if (!error) {
+            resolve(result)
+          } else {
+            reject(new Error(error))
+          }
+        }
+      )
+    })
+  },
   checkUser: (email) => {
     return new Promise((resolve, reject) => {
       connection.query(
@@ -127,5 +140,5 @@ module.exports = {
         }
       )
     })
-  },
+  }
 }

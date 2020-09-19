@@ -8,6 +8,7 @@ const {
   getAllUsers,
   getUserCount,
   getUsersByName, 
+  getUserById,
   postUser, 
   checkUser, 
   checkKey, 
@@ -16,6 +17,8 @@ const {
 } = require("../model/users")
 const { postProfile, postProfileCompany, getProfileWorkerById } = require('../model/profile')
 const { getSkillById } = require("../model/skill")
+const { getPortfolioById } = require('../model/portfolio')
+const { getExpById } = require('../model/experience')
 
 module.exports = {
   getAllUsers: async (request, response) => {
@@ -74,6 +77,19 @@ module.exports = {
       return helper.response(response, 200, 'Success Get Worker', result, pageInfo)
     } catch (error) {
       return helper.response(response, 400, 'Bad Request', error)
+    }
+  },
+  getUserById: async (request, response) => {
+    try {
+      const { id } = request.params
+      const result = await getUserById(id)
+      result[0].profile = await getProfileWorkerById(id)
+      result[0].skill = await getSkillById(id)
+      result[0].portfolio = await getPortfolioById(id)
+      result[0].experience = await getExpById(id)
+      return helper.response(response, 200, 'Get Product Success', result)
+    } catch (error) {
+      return helper.response(response, 400, 'Bad Request', error) 
     }
   },
   getAllUserByName: async (request, response) => {

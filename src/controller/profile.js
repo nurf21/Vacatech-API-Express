@@ -1,6 +1,7 @@
 const {
   getProfile,
   getProfileCompanyById,
+  getProfileWorkerById,
   getProfileCount,
   postProfile,
   patchProfile,
@@ -104,18 +105,22 @@ module.exports = {
       const { id } = request.params;
       const result = await getProfileCompanyById(id)
       if (result.length > 0) {
-        return helper.response(
-          response,
-          200,
-          "Succes get profile By Id",
-          result
-        )
+        return helper.response(response, 200, "Succes get profile By Id", result)
       } else {
-        return helper.response(
-          response,
-          404,
-          `Profile By Id : ${id} Not Found`
-        )
+        return helper.response(response, 404, `Profile By Id : ${id} Not Found`)
+      }
+    } catch (error) {
+      return helper.response(response, 400, "Bad Request", error);
+    }
+  },
+  getProfileWorkerById: async (request, response) => {
+    try {
+      const { id } = request.params;
+      const result = await getProfileWorkerById(id)
+      if (result.length > 0) {
+        return helper.response(response, 200, "Succes get profile By Id", result)
+      } else {
+        return helper.response(response, 404, `Profile By Id : ${id} Not Found`)
       }
     } catch (error) {
       return helper.response(response, 400, "Bad Request", error);

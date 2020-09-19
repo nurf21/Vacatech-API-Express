@@ -52,13 +52,21 @@ module.exports = {
       );
     });
   },
-  getUsersById: (id) => {
+  getUserById: (id) => {
     return new Promise((resolve, reject) => {
       connection.query(
         "SELECT * FROM user WHERE user_id = ?",
         id,
         (error, result) => {
-          !error ? resolve(result) : reject(new Error(error));
+          if(!error) {
+            result.map(value => {
+              delete value.user_password
+              delete value.user_key
+            })
+            resolve(result)
+          } else {
+            reject(new Error(error))
+          }
         }
       );
     });

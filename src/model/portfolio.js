@@ -11,7 +11,7 @@ module.exports = {
   getPortfolioById: (id) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        "SELECT * FROM portfolio WHERE portfolio_id = ?",
+        "SELECT * FROM portfolio WHERE user_id = ?",
         id,
         (error, result) => {
           !error ? resolve(result) : reject(new Error(error))

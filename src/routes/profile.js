@@ -2,6 +2,7 @@ const router = require("express").Router()
 const {
   getAllProfile,
   getProfileCompanyById,
+  getProfileWorkerById,
   postProfile,
   patchProfile,
   deleteProfile,
@@ -9,6 +10,7 @@ const {
 
 router.get("/", getAllProfile)
 router.get("/company/:id", getProfileCompanyById)
+router.get("/worker/:id", getProfileWorkerById)
 
 router.post("/", postProfile)
 

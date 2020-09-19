@@ -3,6 +3,7 @@ const {
   getAllWorker, 
   getAllUsers,
   getAllUserByName, 
+  getUserById,
   loginUser, 
   regWorker, 
   regRecruiter, 
@@ -12,9 +13,9 @@ const {
   activationUser 
 } = require('../controller/users')
 
-router.get('/worker', getAllWorker)
-
 router.get("/", getAllUsers)
+router.get('/worker', getAllWorker)
+router.get('/:id', getUserById)
 router.get("/search", getAllUserByName)
 router.post('/login', loginUser)
 router.post('/register/worker', regWorker)

@@ -1,5 +1,6 @@
 const {
   getProfile,
+  getProfileById,
   getProfileCompanyById,
   getProfileWorkerById,
   getProfileCount,
@@ -7,6 +8,7 @@ const {
   patchProfile,
   deleteProfile,
 } = require("../model/profile")
+const fs = require("fs");
 const helper = require("../helper/index")
 const qs = require("querystring")
 
@@ -100,6 +102,28 @@ module.exports = {
       return helper.response(response, 400, "Bad Request", error)
     }
   },
+  getProfileById: async (request, response) => {
+    try {
+      const { id } = request.params;
+      const result = await getProfileById(id)
+      if (result.length > 0) {
+        return helper.response(
+          response,
+          200,
+          "Succes get profile By Id",
+          result
+        )
+      } else {
+        return helper.response(
+          response,
+          404,
+          `Profile By Id : ${id} Not Found`
+        )
+      }
+    } catch (error) {
+      return helper.response(response, 400, "Bad Request", error);
+    }
+  },
   getProfileCompanyById: async (request, response) => {
     try {
       const { id } = request.params;
@@ -129,66 +153,105 @@ module.exports = {
   postProfile: async (request, response) => {
     try {
       const {
+        user_id,
         profile_name,
         profile_job,
+        job_type,
         profile_address,
         job_address,
+        profile_instagram,
+        profile_git,
         profile_desc,
       } = request.body;
       const setData = {
+        user_id,
         profile_name,
         profile_job,
+        job_type,
+        profile_img :request.file === undefined ? "" : request.file.filename,
         profile_address,
         job_address,
+        profile_instagram,
+        profile_git,
         profile_desc,
         profile_created_at: new Date(),
       }
-      if (setData.profile_name === "") {
+      if (setData.user_id === "") {
+        return helper.response(response, 404, ` Input user id`)
+      } else if (setData.profile_name === "") {
         return helper.response(response, 404, ` Input name!`)
       } else if (setData.profile_job === "") {
         return helper.response(response, 404, ` Input your job desk`)
+      } else if (setData.job_type === "") {
+        return helper.response(response, 404, ` Input job type`)
       } else if (setData.profile_address === "") {
         return helper.response(response, 404, ` Input your address`)
       } else if (setData.job_address === "") {
         return helper.response(response, 404, ` Input job address`)
-      } else {
+      } else if (setData.profile_desc === "") {
+        return helper.response(response, 404, ` Input description`)
+      }else {
         const result = await postProfile(setData)
         return helper.response(response, 201, "Profile Created", result)
       }
     } catch (error) {
-      //   console.log(error);
       return helper.response(response, 400, "Bad Request", error)
     }
   },
   patchProfile: async (request, response) => {
     try {
-      const { id } = request.params
-      const {
+      const { id } = request.params;
+      const { user_id,
         profile_name,
         profile_job,
+        job_type,
         profile_address,
         job_address,
-        profile_desc,
-      } = request.body;
-      const setData = {
-        profile_name,
-        profile_job,
-        profile_address,
-        job_address,
-        profile_desc,
-        profile_updated_at: new Date(),
-      }
-      if (setData.profile_name === "") {
-        return helper.response(response, 404, ` Input your Name!`)
-      } else if (setData.profile_job === "") {
-        return helper.response(response, 404, ` Input your jobDesk!`)
+        profile_instagram,
+        profile_git,
+        profile_desc, } = request.body
+        
+      if (request.body.user_id === "") {
+        return helper.response(response, 404, ` Input id`)
+      } else if (request.body.profile_name === "") {
+        return helper.response(response, 404, ` Input link`)
       } else {
         const checkId = await getProfileById(id)
         if (checkId.length > 0) {
-          const result = await patchProfile(setData, id)
-          return helper.response(response, 200, "Patch Done", result)
+          const setData = {
+            user_id,
+            profile_name,
+            profile_job,
+            job_type,
+            profile_img :request.file === undefined ? checkId[0].profile_img : request.file.filename,
+            profile_address,
+            job_address,
+            profile_instagram,
+            profile_git,
+            profile_desc,
+            profile_updated_at: new Date(),
+          }
+          if (setData.profile_img === checkId[0].profile_img) {
+            const result = await patchProfile(setData, id);
+            return helper.response(
+              response,
+              200,
+              "Patch Done",
+              result
+            );
+          } else {
+            const img = checkId[0].profile_img;
+            fs.unlink(`./uploads/${img}`, async (error) => {
+            if (error) {
+              throw error
+            } else {
+              const result = await patchProfile(setData, id)
+              return helper.response(response, 201, "Patch Done", result)
+            }
+          })
+          }
         } else {
-          return helper.response(response, 404, "Not found", result)
+          return helper.response(response, 404, `Profile By Id: ${id} Not Found`)
         }
       }
     } catch (error) {
@@ -198,10 +261,21 @@ module.exports = {
   deleteProfile: async (request, response) => {
     try {
       const { id } = request.params;
-      const result = await deleteProfile(id)
-      return helper.response(response, 200, "Delete Done", result)
+      const checkId = await getProfileById(id);
+      if (checkId.length > 0) {
+        fs.unlink(`./uploads/${checkId[0].profile_img}`, async (error) => {
+          if (error) {
+            throw error;
+          } else {
+            const result = await deleteProfile(id);
+            return helper.response(response, 201, "Profile Deleted", result);
+          }
+        });
+      } else {
+        return helper.response(response, 404, ` Not Found`);
+      }
     } catch (error) {
-      return helper.response(response, 400, "Bad Request", error)
+      return helper.response(response, 400, "Bad Request", error);
     }
   },
 };

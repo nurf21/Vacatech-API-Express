@@ -3,6 +3,7 @@ const {
   getExpById,
   postExp,
   patchExp,
+  deleteExp
 } = require("../model/experience")
 
 const helper = require("../helper/index")
@@ -89,6 +90,15 @@ module.exports = {
       }
     } catch (error) {
       return helper.response(response, 400, "Bad Request", error)
+    }
+  },
+  deleteExp: async (request, response) => {
+    try {
+      const { id } = request.params;
+      const result = await deleteExp(id);
+      return helper.response(response, 200, "Delete Done", result);
+    } catch (error) {
+      return helper.response(response, 400, "Bad Request", error);
     }
   },
 }

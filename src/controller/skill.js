@@ -3,6 +3,7 @@ const {
   getSkillById,
   postSkill,
   patchSkill,
+  deleteSkill
 } = require("../model/skill")
 
 const helper = require("../helper/index")
@@ -76,6 +77,15 @@ module.exports = {
       }
     } catch (error) {
       return helper.response(response, 400, "Bad Request", error)
+    }
+  },
+  deleteSkill: async (request, response) => {
+    try {
+      const { id } = request.params;
+      const result = await deleteSkill(id);
+      return helper.response(response, 200, "Delete Done", result);
+    } catch (error) {
+      return helper.response(response, 400, "Bad Request", error);
     }
   },
 }

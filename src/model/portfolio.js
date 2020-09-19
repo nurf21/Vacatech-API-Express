@@ -32,8 +32,7 @@ module.exports = {
             }
             resolve(newResult)
           } else {
-            console.log(error)
-            // reject(new Error(error));
+            reject(new Error(error));
           }
         }
       )

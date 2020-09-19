@@ -6,6 +6,7 @@ const {
   patchProfile,
   deleteProfile,
 } = require("../model/profile")
+const fs = require("fs");
 const helper = require("../helper/index")
 const qs = require("querystring")
 
@@ -123,35 +124,40 @@ module.exports = {
   },
   postProfile: async (request, response) => {
     try {
-      const {
-        profile_name,
-        profile_job,
-        profile_address,
-        job_address,
-        profile_desc,
-      } = request.body;
+      const { user_id, profile_name, profile_job, job_type, profile_address, profile_social, profile_git, profile_gitlab, job_address, profile_desc } = request.body;
       const setData = {
+        user_id,
         profile_name,
         profile_job,
+        job_type,
+        profile_img: request.file === undefined ? "blank-profile.jpg" : request.file.filename,
         profile_address,
+        profile_social,
+        profile_git,
+        profile_gitlab,
         job_address,
         profile_desc,
         profile_created_at: new Date(),
       }
-      if (setData.profile_name === "") {
+      if (setData.user_id === "") {
+        return helper.response(response, 404, ` Input user id`)
+      } else if (setData.profile_name === "") {
         return helper.response(response, 404, ` Input name!`)
       } else if (setData.profile_job === "") {
         return helper.response(response, 404, ` Input your job desk`)
+      } else if (setData.job_type === "") {
+        return helper.response(response, 404, ` Input job type`)
       } else if (setData.profile_address === "") {
         return helper.response(response, 404, ` Input your address`)
       } else if (setData.job_address === "") {
         return helper.response(response, 404, ` Input job address`)
-      } else {
+      } else if (setData.profile_desc === "") {
+        return helper.response(response, 404, ` Input description`)
+      }else {
         const result = await postProfile(setData)
         return helper.response(response, 201, "Profile Created", result)
       }
     } catch (error) {
-      //   console.log(error);
       return helper.response(response, 400, "Bad Request", error)
     }
   },
@@ -159,16 +165,27 @@ module.exports = {
     try {
       const { id } = request.params
       const {
+        user_id,
         profile_name,
         profile_job,
+        job_type,
         profile_address,
+        profile_social,
+        profile_git,
+        profile_gitlab,
         job_address,
         profile_desc,
       } = request.body;
       const setData = {
+        user_id,
         profile_name,
         profile_job,
+        job_type,
+        profile_img: request.file === undefined ? "blank-profile.jpg" : request.file.filename,
         profile_address,
+        profile_social,
+        profile_git,
+        profile_gitlab,
         job_address,
         profile_desc,
         profile_updated_at: new Date(),

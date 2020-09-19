@@ -5,13 +5,14 @@ const {
   postPortfolio,
   patchPortfolio,
 } = require("../controller/portfolio")
+const uploadImage = require("../middleware/multer");
 
 //GET
 router.get("/", getAllPortfolio)
 router.get("/:id", getPortfolioById)
 
 //POST
-router.post("/", postPortfolio)
-router.patch("/:id", patchPortfolio)
+router.post("/", uploadImage, postPortfolio)
+router.patch("/:id",uploadImage, patchPortfolio)
 
 module.exports = router

@@ -19,10 +19,8 @@ const fileFilter = (request, file, callback) => {
     callback(null, true)
   }
 }
-
 const maxSize = 2097152
-const upload = multer({ storage, fileFilter, limits: { fileSize: maxSize } }).single('product_image')
-
+const upload = multer({ storage, fileFilter, limits: { fileSize: maxSize } }).array('portfolio_img', 12)
 const uploadFilter = (request, response, next) => {
   upload(request, response, function (err) {
     if (err instanceof multer.MulterError) {

@@ -12,6 +12,17 @@ module.exports = {
       )
     })
   },
+  getProfileById: (id) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        "SELECT * FROM profile WHERE profile_id = ?",
+        id,
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
+  },
   getProfileCount: () => {
     return new Promise((resolve, reject) => {
       connection.query(

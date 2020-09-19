@@ -4,14 +4,21 @@ const {
   getPortfolioById,
   postPortfolio,
   patchPortfolio,
+  deletePortfolio
 } = require("../controller/portfolio")
+
+// const uploadImage = require("../middleware/multer");
+const imageFolio = require("../middleware/multerFolio");
 
 //GET
 router.get("/", getAllPortfolio)
 router.get("/:id", getPortfolioById)
 
 //POST
-router.post("/", postPortfolio)
-router.patch("/:id", patchPortfolio)
+router.post("/", imageFolio, postPortfolio)
+router.patch("/:id", imageFolio,patchPortfolio)
+
+//DELETE
+router.delete("/:id", deletePortfolio);
 
 module.exports = router

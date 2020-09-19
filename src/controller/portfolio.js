@@ -3,6 +3,7 @@ const {
   getPortfolioById,
   postPortfolio,
   patchPortfolio,
+  deletePortfolio,
 } = require("../model/portfolio")
 
 const fs = require("fs");
@@ -43,8 +44,9 @@ module.exports = {
   },
   postPortfolio: async (request, response) => {
     try {
-      const { portfolio_name, portfolio_link, portfolio_type } = request.body
+      const { user_id, portfolio_name, portfolio_link, portfolio_type } = request.body
       const setData = {
+        user_id,
         portfolio_name,
         portfolio_link,
         portfolio_type,
@@ -61,15 +63,16 @@ module.exports = {
         return helper.response(response, 201, "Portfolio Created", result)
       }
     } catch (error) {
-      console.log(error)
-      //   return helper.response(response, 400, "Bad Request", error);
+    //   console.log(error)
+        return helper.response(response, 400, "Bad Request", error);
     }
   },
   patchPortfolio: async (request, response) => {
     try {
       const { id } = request.params;
-      const { portfolio_name, portfolio_link, portfolio_type } = request.body
+      const { user_id, portfolio_name, portfolio_link, portfolio_type } = request.body
       const setData = {
+        user_id,
         portfolio_name,
         portfolio_link,
         portfolio_type,
@@ -78,8 +81,8 @@ module.exports = {
       }
       if (setData.user_id === "") {
         return helper.response(response, 404, ` Input id`)
-      } else if (setData.skill_name === "") {
-        return helper.response(response, 404, ` Input skill`)
+      } else if (setData.portfolio_name === "") {
+        return helper.response(response, 404, ` Input link`)
       } else {
         const checkId = await getPortfolioById(id)
         const img = checkId[0].portfolio_img;
@@ -98,6 +101,26 @@ module.exports = {
       }
     } catch (error) {
       return helper.response(response, 400, "Bad Request", error)
+    }
+  },
+  deletePortfolio: async (request, response) => {
+    try {
+      const { id } = request.params;
+      const checkId = await getPortfolioById(id);
+      if (checkId.length > 0) {
+        fs.unlink(`./uploads/${checkId[0].portfolio_img}`, async (error) => {
+          if (error) {
+            throw error;
+          } else {
+            const result = await deletePortfolio(id);
+            return helper.response(response, 201, "Portfolio Deleted", result);
+          }
+        });
+      } else {
+        return helper.response(response, 404, ` Not Found`);
+      }
+    } catch (error) {
+      return helper.response(response, 400, "Bad Request", error);
     }
   },
 }

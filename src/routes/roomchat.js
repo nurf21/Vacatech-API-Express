@@ -1,10 +1,20 @@
 const router = require("express").Router()
-const { getMessageChatByRoom, getMessageByUserId, getRecentMessage, postRoomChat, postMessage } = require("../controller/roomchat")
+const { 
+    getMessageChatByRoom, 
+    getMessageByUserId, 
+    // getRecentMessage, 
+    getRoomChatById, 
+    getNotificationById,
+    postRoomChat, 
+    postMessage 
+} = require("../controller/roomchat")
 
 
-router.get("/chat", getMessageChatByRoom)
-router.get("/chat/recent", getRecentMessage)
+router.get("/chat/message", getMessageChatByRoom)
+router.get("/chat/room", getRoomChatById)
 router.get("/chat/user", getMessageByUserId)
+router.get("/chat/notif", getNotificationById)
+// router.get("/chat/recent", getRecentMessage)
 
 router.post("/", postRoomChat)
 router.post("/message", postMessage)

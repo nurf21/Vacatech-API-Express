@@ -9,10 +9,10 @@ const {
 } = require("../controller/roomchat")
 
 
-router.get("/chat/message", getMessageChatByRoom)
-router.get("/chat/room", getRoomChatById)
+router.get("/chat/message/:roomchat_id", getMessageChatByRoom)
+router.get("/chat/room/:user_id", getRoomChatById)
 router.get("/chat/user", getMessageByUserId)
-router.get("/chat/notif", getNotificationById)
+router.get("/chat/notif/:id", getNotificationById)
 
 router.post("/", postRoomChat)
 router.post("/message", postMessage)

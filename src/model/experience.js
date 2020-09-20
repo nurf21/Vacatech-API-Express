@@ -11,7 +11,7 @@ module.exports = {
   getExpById: (id) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        "SELECT * FROM experience WHERE exp_id = ?",
+        "SELECT * FROM experience WHERE user_id = ?",
         id,
         (error, result) => {
           !error ? resolve(result) : reject(new Error(error))

@@ -1,17 +1,20 @@
-const connection = require("../config/mysql");
+const connection = require("../config/mysql")
 
 module.exports = {
-  getAllPortfolio: () => {
-    return new Promise((resolve, reject) => {
-      connection.query("SELECT * FROM portfolio", (error, result) => {
-        !error ? resolve(result) : reject(new Error(error))
-      })
-    })
-  },
-  getPortfolioById: (id) => {
+  getCompanyProfile: () => {
     return new Promise((resolve, reject) => {
       connection.query(
-        "SELECT * FROM portfolio WHERE user_id = ?",
+        `SELECT * FROM company_profile`,
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
+  },
+  getCompanyProfileById: (id) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        "SELECT * FROM company_profile WHERE profile_id = ?",
         id,
         (error, result) => {
           !error ? resolve(result) : reject(new Error(error))
@@ -19,60 +22,73 @@ module.exports = {
       )
     })
   },
-  postPortfolio: (setData) => {
+
+  getCompanyProfileById: (id) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        "INSERT INTO portfolio SET ?",
+        "SELECT * FROM company_profile WHERE profile_id = ?",
+        id,
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
+  },
+ 
+  postCompanyProfile: (setData) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        "INSERT INTO company_profile SET ?",
         setData,
         (error, result) => {
           if (!error) {
             const newResult = {
-              portfolio_id: result.insertId,
+              profile_id: result.insertId,
               ...setData,
             }
-            resolve(newResult)
-          } else {
-            reject(new Error(error));
-          }
-        }
-      )
-    })
-  },
-  patchPortfolio: (setData, id) => {
-    return new Promise((resolve, reject) => {
-      connection.query(
-        "UPDATE portfolio SET ? WHERE portfolio_id = ?",
-        [setData, id],
-        (error, result) => {
-          if (!error) {
-            const newResult = {
-              portfolio_id: id,
-              ...setData,
-            }
-            resolve(newResult)
-          } else {
-            reject(new Error(error))
-          }
-        }
-      )
-    })
-  },
-  deletePortfolio: (id) => {
-    return new Promise((resolve, reject) => {
-      connection.query(
-        "DELETE FROM portfolio WHERE portfolio_id = ?",
-        id,
-        (error, result) => {
-          if (!error) {
-            const newResult = {
-              id: id,
-            };
             resolve(newResult);
           } else {
             reject(new Error(error));
           }
         }
-      );
-    });
+      )
+    })
+  },
+  patchCompanyProfile: (setData, id) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        "UPDATE company_profile SET ? WHERE profile_id = ?",
+        [setData, id],
+        (error, result) => {
+          if (!error) {
+            const newResult = {
+              profile_id: id,
+              ...setData,
+            }
+            resolve(newResult);
+          } else {
+            reject(new Error(error));
+          }
+        }
+      )
+    })
+  },
+  deleteCompanyProfile: (id) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        "DELETE FROM company_profile WHERE profile_id = ?",
+        id,
+        (error, result) => {
+          if (!error) {
+            const newResult = {
+              id: id,
+            }
+            resolve(newResult);
+          } else {
+            reject(new Error(error));
+          }
+        }
+      )
+    })
   },
 }

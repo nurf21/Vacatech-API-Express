@@ -4,42 +4,21 @@ const jwt = require("jsonwebtoken")
 const nodemailer = require("nodemailer")
 const qs = require("querystring")
 const { 
-  // getAllWorker, 
+  getAllWorker, 
   getAllUsers,
   getUserCount,
   getUsersByName, 
+  getUserById,
   postUser, 
   checkUser, 
   checkKey, 
   changePassword, 
-  // getCountWorker 
+  getCountWorker 
 } = require("../model/users")
-// const { postProfile, postProfileCompany, getProfileWorkerById } = require('../model/profile')
-// const { getSkillById } = require("../model/skill")
-
-// const getPrevLink = (page, currentQuery) => {
-//   if (page > 1) {
-//     const generatePage = {
-//       page: page - 1,
-//     };
-//     const resultPrevLink = { ...currentQuery, ...generatePage }
-//     return qs.stringify(resultPrevLink)
-//   } else {
-//     return null
-//   }
-// }
-
-// const getNextLink = (page, totalPage, currentQuery) => {
-//   if (page < totalPage) {
-//     const generatePage = {
-//       page: page + 1,
-//     }
-//     const resultNextLink = { ...currentQuery, ...generatePage }
-//     return qs.stringify(resultNextLink);
-//   } else {
-//     return null;
-//   }
-// }
+const { postProfile, postProfileCompany, getProfileWorkerById } = require('../model/profile')
+const { getSkillById } = require("../model/skill")
+const { getPortfolioById } = require('../model/portfolio')
+const { getExpById } = require('../model/experience')
 
 module.exports = {
   getAllUsers: async (request, response) => {
@@ -73,38 +52,46 @@ module.exports = {
       return helper.response(response, 400, "Bad Request", error)
     }
   },
-  // getAllWorker: async (request, response) => {
-  //   let { page, limit, sort } = request.query
-  //   page === undefined || page === '' ? (page = 1) : (page = parseInt(page))
-  //   limit === undefined || limit === '' ? (limit = 6) : (limit = parseInt(limit))
-  //   const totalData = await getCountWorker()
-  //   if (sort === undefined || sort === '') {
-  //     sort = 'user_id'
-  //   }
-  //   const totalPage = Math.ceil(totalData / limit)
-  //   const offset = page * limit - limit
-  //   const prevLink = getPrevLink(page, request.query)
-  //   const nextLink = getNextLink(page, totalPage, request.query)
-  //   const pageInfo = {
-  //     page,
-  //     totalPage,
-  //     limit,
-  //     totalData,
-  //     prevLink: prevLink && `http://127.0.0.1:3001/product?${prevLink}`,
-  //     nextLink: nextLink && `http://127.0.0.1:3001/product?${nextLink}`
-  //   }
-  //   try {
-  //     const result = await getAllWorker(sort, limit, offset)
-  //     for (let i = 0; i < result.length; i++) {
-  //       result[i].profile = await getProfileWorkerById(result[i].user_id)
-  //       result[i].skill = await getSkillById(result[i].user_id)
-  //     }
-  //     return helper.response(response, 200, 'Success Get Worker', result, pageInfo)
-  //   } catch (error) {
-  //     console.log(error)
-  //     return helper.response(response, 400, 'Bad Request', error)
-  //   }
-  // },
+  getAllWorker: async (request, response) => {
+    let { page, limit, sort } = request.query
+    page === undefined || page === '' ? (page = 1) : (page = parseInt(page))
+    limit === undefined || limit === '' ? (limit = 6) : (limit = parseInt(limit))
+    const totalData = await getCountWorker(sort)
+    if (sort === undefined || sort === null) {
+      sort = 'user_id'
+    }
+    const totalPage = Math.ceil(totalData / limit)
+    const offset = page * limit - limit
+    const pageInfo = {
+      page,
+      totalPage,
+      limit,
+      totalData
+    }
+    try {
+      const result = await getAllWorker(sort, limit, offset)
+      for (let i = 0; i < result.length; i++) {
+        result[i].profile = await getProfileWorkerById(result[i].user_id)
+        result[i].skill = await getSkillById(result[i].user_id)
+      }
+      return helper.response(response, 200, 'Success Get Worker', result, pageInfo)
+    } catch (error) {
+      return helper.response(response, 400, 'Bad Request', error)
+    }
+  },
+  getUserById: async (request, response) => {
+    try {
+      const { id } = request.params
+      const result = await getUserById(id)
+      result[0].profile = await getProfileWorkerById(id)
+      result[0].skill = await getSkillById(id)
+      result[0].portfolio = await getPortfolioById(id)
+      result[0].experience = await getExpById(id)
+      return helper.response(response, 200, 'Get Product Success', result)
+    } catch (error) {
+      return helper.response(response, 400, 'Bad Request', error) 
+    }
+  },
   getAllUserByName: async (request, response) => {
     try {
       let { search } = request.query;

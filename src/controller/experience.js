@@ -43,8 +43,9 @@ module.exports = {
   },
   postExp: async (request, response) => {
     try {
-      const { exp_position, exp_company, exp_date, exp_desc } = request.body
+      const { user_id, exp_position, exp_company, exp_date, exp_desc } = request.body
       const setData = {
+        user_id,
         exp_position,
         exp_company,
         exp_date,
@@ -60,8 +61,8 @@ module.exports = {
         return helper.response(response, 201, "Experience Created", result);
       }
     } catch (error) {
-      console.log(error)
-      //   return helper.response(response, 400, "Bad Request", error);
+        console.log(error)
+        return helper.response(response, 400, "Bad Request", error);
     }
   },
   patchExp: async (request, response) => {

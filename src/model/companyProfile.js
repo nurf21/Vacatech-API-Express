@@ -57,9 +57,7 @@ module.exports = {
   patchCompanyProfile: (setData, id) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        "UPDATE company_profile SET ? WHERE profile_id = ?",
-        [setData, id],
-        (error, result) => {
+        "UPDATE company_profile SET ? WHERE profile_id = ?", [setData, id], (error, result) => {
           if (!error) {
             const newResult = {
               profile_id: id,

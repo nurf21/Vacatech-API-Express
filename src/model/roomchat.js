@@ -45,17 +45,6 @@ module.exports = {
         )
       })
     },
-  // getRecentMessage: (recent) => {
-  //   return new Promise((resolve, reject) => {
-  //     connection.query(
-  //       "SELECT * FROM messages WHERE user_id = ? ORDER BY msg_created_at DESC LIMIT 5",
-  //       recent,
-  //       (error, result) => {
-  //         !error ? resolve(result) : reject(new Error(error));
-  //       }
-  //     )
-  //   })
-  // },
     postRoomChat: (setData) => {
         return new Promise((resolve, reject) => {
           connection.query("INSERT INTO roomchat SET ?", setData, (error, result) => {

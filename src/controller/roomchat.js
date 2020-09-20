@@ -2,7 +2,6 @@ const {
   getMessageChatByRoom, 
   getMessageByUserId, 
   getNotificationById,
-  // getRecentMessage, 
   getRoomChatById, 
   postRoomChat, 
   postMessage,
@@ -66,19 +65,6 @@ module.exports = {
           return helper.response(response, 400, "Bad Request", error)
         }
     },
-    // getRecentMessage: async (request, response) => {
-    //     try {
-    //       const { user_id } = request.body;
-    //       const result = await getRecentMessage(user_id)
-    //       if (result.length > 0) {
-    //         return helper.response(response, 200, "Succes get Message By Roomchat Id", result)
-    //       } else {
-    //         return helper.response(response, 404, `Message By Id : ${user_id} Not Found`)
-    //       }
-    //     } catch (error) {
-    //       return helper.response(response, 400, "Bad Request", error)
-    //     }
-    //   },
     postRoomChat: async (request, response) => {
         try {
         const {user_worker, user_recruiter, msg} = request.body

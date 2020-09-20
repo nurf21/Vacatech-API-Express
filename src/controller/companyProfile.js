@@ -1,14 +1,13 @@
 const {
-    getCompanyProfile,
-    getCompanyProfileById,
-    postCompanyProfile,
-    patchCompanyProfile,
-    deleteCompanyProfile
-  } = require("../model/companyProfile")
-  
-  const helper = require("../helper/index")
-  const { request, response } = require("express")
-  const fs = require("fs");
+  getCompanyProfile,
+  getCompanyProfileById,
+  postCompanyProfile,
+  patchCompanyProfile,
+  deleteCompanyProfile
+} = require("../model/companyProfile")
+const helper = require("../helper/index")
+const fs = require("fs");
+const { getUserById, patchUser } = require("../model/users");
   
   module.exports = {
     getCompanyProfile: async (request, response) => {
@@ -83,81 +82,84 @@ const {
           return helper.response(response, 201, "Company Profile Created", result);
         }
       } catch (error) {
-        // console.log(error)
         return helper.response(response, 400, "Bad Request", error);
       }
     },
     patchCompanyProfile: async (request, response) => {
-        try {
-          const { id } = request.params;
-          const { user_id,profile_name, profile_field, profile_city, profile_desc,profile_email,profile_instagram,profile_telp,profile_linkedin } = request.body
-            
-          if (request.body.user_id === "") {
-            return helper.response(response, 404, ` Input id`)
-          } else if (request.body.profile_field === "") {
-            return helper.response(response, 404, ` Input field`)
-          } else {
-            const checkId = await getCompanyProfileById(id)
-            if (checkId.length > 0) {
-              const setData = {
-                user_id,
-                profile_name,
-                profile_img :request.file === undefined ? checkId[0].profile_img : request.file.filename,
-                profile_field,
-                profile_city,
-                profile_desc,
-                profile_email,
-                profile_instagram,
-                profile_telp,
-                profile_linkedin,
-                profile_updated_at: new Date(),
-              }
-              if (setData.profile_img === checkId[0].profile_img) {
-                const result = await patchCompanyProfile(setData, id);
-                return helper.response(
-                  response,
-                  200,
-                  "Patch Done",
-                  result
-                );
-              } else {
-                const img = checkId[0].profile_img;
-                fs.unlink(`./uploads/${img}`, async (error) => {
-                if (error) {
-                  throw error
-                } else {
-                  const result = await patchCompanyProfile(setData, id)
-                  return helper.response(response, 201, "Patch Done", result)
-                }
-              })
-              }
-            } else {
-              return helper.response(response, 404, `Profile By Id: ${id} Not Found`)
-            }
+      try {
+        const { id } = request.params;
+        const { user_id, company_name, profile_field, profile_city, profile_desc, profile_email, profile_instagram, user_phone, profile_linkedin } = request.body
+        const checkUser = await getUserById(user_id)
+        const checkId = await getCompanyProfileById(id)
+        if (checkId.length > 0  && checkUser.length > 0 ) {
+          const setDataUser = {
+            company_name,
+            user_phone
           }
-        } catch (error) {
-            // console.log(error)
-          return helper.response(response, 400, "Bad Request", error)
+          await patchUser(setDataUser, user_id)
+          const setDataProfile = {
+            profile_field,
+            profile_city,
+            profile_desc,
+            profile_email,
+            profile_instagram,
+            profile_linkedin,
+            profile_updated_at: new Date(),
+          }
+          const result = await patchCompanyProfile(setDataProfile, id);
+          return helper.response(response, 201, 'Profile Updated', result)
+        } else {
+          return helper.response(response, 404, `Profile By Id: ${id} Not Found`)
         }
-      },
-      deleteCompanyProfile: async (request, response) => {
-        try {
-          const { id } = request.params;
-          const checkId = await getCompanyProfileById(id);
-          if (checkId.length > 0) {
+      } catch (error) {
+        return helper.response(response, 400, "Bad Request", error)
+      }
+    },
+    patchImageCompanyProfile: async (request, response) => {
+      const { id } = request.params
+      try {
+        const setData = {
+          profile_img: request.file.filename
+        }
+        const checkId = await getCompanyProfileById(id)
+        if (checkId.length > 0) {
+          if (checkId[0].profile_img === 'blank-profile.jpg' || request.file == undefined) {
+            const result = await patchCompanyProfile(setData, id)
+            return helper.response(response, 201, 'Profile Updated', result)
+          } else {
             fs.unlink(`./uploads/${checkId[0].profile_img}`, async (error) => {
               if (error) {
-                throw error;
+                throw error
               } else {
-                const result = await deleteCompanyProfile(id);
-                return helper.response(response, 201, "Company Profile Deleted", result);
+                const result = await patchCompanyProfile(setData, id)
+                return helper.response(response, 201, 'Profile Updated', result)
               }
-            });
-          } else {
-            return helper.response(response, 404, ` Not Found`);
+            })
           }
-        } catch (error) {
-          return helper.response(response, 400, "Bad Request", error);
         }
-      },
+      } catch (error) {
+        console.log(error)
+        return helper.response(response, 400, "Bad Request", error)
+      }
+    },
+    deleteCompanyProfile: async (request, response) => {
+      try {
+        const { id } = request.params;
+        const checkId = await getCompanyProfileById(id);
+        if (checkId.length > 0) {
+          fs.unlink(`./uploads/${checkId[0].profile_img}`, async (error) => {
+            if (error) {
+              throw error;
+            } else {
+              const result = await deleteCompanyProfile(id);
+              return helper.response(response, 201, "Company Profile Deleted", result);
+            }
+          });
+        } else {
+          return helper.response(response, 404, ` Not Found`);
+        }
+      } catch (error) {
+        return helper.response(response, 400, "Bad Request", error);
+      }
+    },
   }

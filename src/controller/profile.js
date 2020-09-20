@@ -157,7 +157,7 @@ module.exports = {
       const checkUser = await getUserById(user_id)
       const checkId = await getProfileById(id)
       if (checkId.length > 0 && checkUser.length > 0) {
-        setDataUser = {
+        const setDataUser = {
           user_name
         }
         await patchUser(setDataUser, user_id)

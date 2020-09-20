@@ -4,6 +4,7 @@ const {
   getCompanyProfileById,
   postCompanyProfile,
   patchCompanyProfile,
+  patchImageCompanyProfile,
   deleteCompanyProfile,
 } = require("../controller/companyProfile")
 const uploadImage = require("../middleware/multer");
@@ -13,7 +14,8 @@ router.get("/:id", getCompanyProfileById)
 
 router.post("/",uploadImage, postCompanyProfile)
 
-router.patch("/:id",uploadImage, patchCompanyProfile)
+router.patch("/:id", patchCompanyProfile)
+router.patch("/image/:id",uploadImage, patchImageCompanyProfile)
 
 router.delete("/:id", deleteCompanyProfile)
 

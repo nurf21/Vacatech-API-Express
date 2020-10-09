@@ -19,6 +19,17 @@ module.exports = {
       )
     })
   },
+  getPortflioByPortfolioId: (id) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        "SELECT * FROM portfolio WHERE portfolio_id = ?",
+        id,
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
+  },
   postPortfolio: (setData) => {
     return new Promise((resolve, reject) => {
       connection.query(

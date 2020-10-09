@@ -53,10 +53,10 @@ module.exports = {
       )
     })
   },
-  getUserBySkill: (id) => {
+  getSkillBySkillId: (id) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        "SELECT * FROM skill WHERE user_id = ?",
+        "SELECT * FROM skill WHERE skill_id = ?",
         id,
         (error, result) => {
           !error ? resolve(result) : reject(new Error(error))

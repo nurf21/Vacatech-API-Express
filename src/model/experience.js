@@ -19,6 +19,17 @@ module.exports = {
       )
     })
   },
+  getExpByExpId: (id) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        "SELECT * FROM experience WHERE exp_id = ?",
+        id,
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
+  },
   postExp: (setData) => {
     return new Promise((resolve, reject) => {
       connection.query(

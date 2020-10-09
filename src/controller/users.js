@@ -127,7 +127,7 @@ module.exports = {
       company_name: "",
       company_depart: "",
       user_created_at: new Date(),
-      user_status: 0,
+      user_status: 1,
       user_key: 0
     }
     try {
@@ -141,7 +141,6 @@ module.exports = {
         return helper.response(response, 400, "Password didn't match")
       } else {
         const result = await postUser(setData)
-        console.log(result)
         const setData2 = {
           user_id: result.id,
           profile_img: 'blank-profile.jpg',
@@ -204,7 +203,6 @@ module.exports = {
         return helper.response(response, 200, "Success Register User")
       }
     } catch (error) {
-      console.log(error)
       return helper.response(response, 400, "Bad Request")
     }
   },

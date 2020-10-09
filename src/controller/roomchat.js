@@ -2,11 +2,13 @@ const {
   getMessageChatByRoom, 
   getMessageByUserId, 
   getNotificationById,
-  getRoomChatById, 
+  getRoomChatById,
+  getIdFromRoomchat, 
   postRoomChat, 
   postMessage,
   postNotification
 } = require("../model/roomchat")
+const { getUserById } = require("../model/users")
 
 const helper = require("../helper/index")
 const { request, response } = require("express")
@@ -25,18 +27,43 @@ module.exports = {
       return helper.response(response, 400, "Bad Request", error)
     }
   },
-  //get roomchat by user id
   getRoomChatById: async (request, response) => {
     try {
       const { user_id } = request.params
       const result = await getRoomChatById(user_id)
+      const otherId = await Promise.all(result.map( async (value)=>{
+        const ids = value.roomchat_id
+        const roomchatId = await getIdFromRoomchat(ids)
+        const filtered = roomchatId.filter(value=>{
+          return value.user_id != user_id
+        })
+        const getInfo = await getUserById(filtered[0].user_id)
+        const setData = {
+          roomchat_id: ids,
+          user_id: getInfo[0].user_id,
+          user_email: getInfo[0].user_email,
+          user_name: getInfo[0].user_name,
+          user_img: getInfo[0].user_img,
+          user_phone: getInfo[0].user_phone,
+        }
+        console.log(setData)
+      }))
+      
+      // const getOtherId = await getIdFromRoomchat(result.roomchat_id)
+      // console.log(getOtherId)
+      // const mapped = result.map((item, index) => {
+      //   const filtered = item.filter(value => {
+
+      //   })
+      // })
       if (result.length > 0) {
         return helper.response(response, 200, "Succes get Roomchat By User Id", result)
       } else {
         return helper.response(response, 404, `Message By Id : ${user_id} Not Found`)
       }
     } catch (error) {
-      return helper.response(response, 400, "Bad Request", error)
+      // return helper.response(response, 400, "Bad Request", error)
+      console.log(error)
     }
   },
   getMessageChatByRoom: async (request, response) => {

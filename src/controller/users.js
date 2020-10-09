@@ -3,17 +3,17 @@ const helper = require("../helper")
 const jwt = require("jsonwebtoken")
 const nodemailer = require("nodemailer")
 const qs = require("querystring")
-const { 
-  getAllWorker, 
+const {
+  getAllWorker,
   getAllUsers,
   getUserCount,
-  getUsersByName, 
+  getUsersByName,
   getUserById,
-  postUser, 
-  checkUser, 
-  checkKey, 
-  changePassword, 
-  getCountWorker 
+  postUser,
+  checkUser,
+  checkKey,
+  changePassword,
+  getCountWorker
 } = require("../model/users")
 const { postProfile, postProfileCompany, getProfileWorkerById } = require('../model/profile')
 const { getSkillById } = require("../model/skill")
@@ -87,22 +87,22 @@ module.exports = {
       result[0].skill = await getSkillById(id)
       result[0].portfolio = await getPortfolioById(id)
       result[0].experience = await getExpById(id)
-      return helper.response(response, 200, 'Get Product Success', result)
+      return helper.response(response, 200, 'Get Id Success', result)
     } catch (error) {
-      return helper.response(response, 400, 'Bad Request', error) 
+      return helper.response(response, 400, 'Bad Request', error)
     }
   },
   getAllUserByName: async (request, response) => {
     try {
       let { search } = request.query;
-    if (search === undefined || search === null || search === "") {
-      search = "%";
-    } else {
-      search = "%" + search + "%";
-    }
-    let page = parseInt(1)
-    let limit = parseInt(40)
-    let offset = page * limit - limit;
+      if (search === undefined || search === null || search === "") {
+        search = "%";
+      } else {
+        search = "%" + search + "%";
+      }
+      let page = parseInt(1)
+      let limit = parseInt(40)
+      let offset = page * limit - limit;
       const result = await getUsersByName(search, limit, offset);
       return helper.response(
         response,
@@ -341,7 +341,7 @@ module.exports = {
           request.body.user_password.length > 16
         ) {
           return helper.response(response, 400, "Password must be 8-16 characters")
-        }else if (request.body.confirm_password !== request.body.user_password) {
+        } else if (request.body.confirm_password !== request.body.user_password) {
           return helper.response(response, 400, "Password didn't match");
         } else {
           const salt = bcrypt.genSaltSync(10);
@@ -389,11 +389,11 @@ module.exports = {
           subject: "Vacatech - Activation Email",
           html: `<a href="http://localhost:8080/activate?keys=${keys}">Click Here To Activate Your Account</a>`,
         }),
-        function (error) {
-          if (error) {
-            return helper.response(response, 400, 'Email not sent !')
+          function (error) {
+            if (error) {
+              return helper.response(response, 400, 'Email not sent !')
+            }
           }
-        }
         return helper.response(response, 200, 'Email has been sent !')
       } else {
         return helper.response(response, 400, 'Email is not registered !')

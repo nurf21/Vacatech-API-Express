@@ -26,7 +26,18 @@ module.exports = {
     getRoomChatById: (id) => {
       return new Promise((resolve, reject) => {
         connection.query(
-          "SELECT * FROM roomchat LEFT JOIN user ON roomchat.user_id = user.user_id WHERE roomchat.user_id = ?",
+          "SELECT * FROM roomchat JOIN user ON roomchat.user_id = user.user_id WHERE roomchat.user_id = ?",
+          id,
+          (error, result) => {
+            !error ? resolve(result) : reject(new Error(error));
+          }
+        )
+      })
+    },
+    getIdFromRoomchat: (id) => {
+      return new Promise((resolve, reject) => {
+        connection.query(
+          "SELECT * FROM roomchat WHERE roomchat_id = ?",
           id,
           (error, result) => {
             !error ? resolve(result) : reject(new Error(error));

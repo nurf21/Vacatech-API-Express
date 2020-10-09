@@ -146,9 +146,12 @@ module.exports = {
           user_id: result.id,
           profile_img: 'blank-profile.jpg',
           profile_job: '',
+          job_type: '',
           profile_address: '',
           job_address: '',
           profile_desc: '',
+          profile_instagram: '',
+          profile_git: '',
           profile_created_at: new Date(),
         }
         const result2 = await postProfile(setData2)
@@ -173,6 +176,7 @@ module.exports = {
       company_depart: request.body.company_depart,
       user_created_at: new Date(),
       user_status: 0,
+      user_key: 0
     }
     try {
       if (checkEmail.length > 0) {
@@ -191,6 +195,7 @@ module.exports = {
           profile_field: '',
           profile_city: '',
           profile_desc: '',
+          profile_email: '',
           profile_instagram: '',
           profile_linkedin: '',
           profile_created_at: new Date(),

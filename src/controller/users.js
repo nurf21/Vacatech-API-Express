@@ -127,7 +127,8 @@ module.exports = {
       company_name: "",
       company_depart: "",
       user_created_at: new Date(),
-      user_status: 0,
+      user_status: 1,
+      user_key: 0
     }
     try {
       if (checkEmail.length > 0) {
@@ -144,15 +145,19 @@ module.exports = {
           user_id: result.id,
           profile_img: 'blank-profile.jpg',
           profile_job: '',
+          job_type: '',
           profile_address: '',
           job_address: '',
           profile_desc: '',
+          profile_instagram: '',
+          profile_git: '',
           profile_created_at: new Date(),
         }
         const result2 = await postProfile(setData2)
         return helper.response(response, 200, "Success Register User")
       }
     } catch (error) {
+      console.log(error)
       return helper.response(response, 400, "Bad Request")
     }
   },
@@ -170,6 +175,7 @@ module.exports = {
       company_depart: request.body.company_depart,
       user_created_at: new Date(),
       user_status: 0,
+      user_key: 0
     }
     try {
       if (checkEmail.length > 0) {
@@ -188,6 +194,7 @@ module.exports = {
           profile_field: '',
           profile_city: '',
           profile_desc: '',
+          profile_email: '',
           profile_instagram: '',
           profile_linkedin: '',
           profile_created_at: new Date(),
@@ -196,7 +203,6 @@ module.exports = {
         return helper.response(response, 200, "Success Register User")
       }
     } catch (error) {
-      console.log(error)
       return helper.response(response, 400, "Bad Request")
     }
   },

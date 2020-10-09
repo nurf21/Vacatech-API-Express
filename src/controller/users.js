@@ -140,6 +140,7 @@ module.exports = {
         return helper.response(response, 400, "Password didn't match")
       } else {
         const result = await postUser(setData)
+        console.log(result)
         const setData2 = {
           user_id: result.id,
           profile_img: 'blank-profile.jpg',

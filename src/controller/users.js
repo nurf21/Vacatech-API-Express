@@ -128,6 +128,7 @@ module.exports = {
       company_depart: "",
       user_created_at: new Date(),
       user_status: 0,
+      user_key: 0
     }
     try {
       if (checkEmail.length > 0) {

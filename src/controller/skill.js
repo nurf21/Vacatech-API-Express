@@ -1,6 +1,7 @@
 const {
   getAllSkill,
   getSkillById,
+  getSkillBySkillId,
   postSkill,
   patchSkill,
   deleteSkill
@@ -66,15 +67,16 @@ module.exports = {
       } else if (setData.skill_name === "") {
         return helper.response(response, 404, ` Input skill`)
       } else {
-        const checkId = await getSkillById(id)
+        const checkId = await getSkillBySkillId(id)
         if (checkId.length > 0) {
           const result = await patchSkill(setData, id)
-          return helper.response(response, 200, "Patch Done", result)
+          return helper.response(response, 200, "Skill updated", result)
         } else {
-          return helper.response(response, 404, "Not found", result)
+          return helper.response(response, 404, "Not found")
         }
       }
     } catch (error) {
+      console.log(error)
       return helper.response(response, 400, "Bad Request", error)
     }
   },
@@ -82,7 +84,7 @@ module.exports = {
     try {
       const { id } = request.params;
       const result = await deleteSkill(id);
-      return helper.response(response, 200, "Delete Done", result);
+      return helper.response(response, 200, "Skill deleted", result);
     } catch (error) {
       return helper.response(response, 400, "Bad Request", error);
     }

@@ -173,9 +173,9 @@ module.exports = {
       user_phone: request.body.user_phone,
       company_name: request.body.company_name,
       company_depart: request.body.company_depart,
-      user_created_at: new Date(),
-      user_status: 0,
-      user_key: 0
+      user_status: 1,
+      user_key: 0,
+      user_created_at: new Date()
     }
     try {
       if (checkEmail.length > 0) {

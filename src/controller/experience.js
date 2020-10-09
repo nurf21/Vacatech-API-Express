@@ -1,6 +1,7 @@
 const {
   getAllExp,
   getExpById,
+  getExpByExpId,
   postExp,
   patchExp,
   deleteExp
@@ -58,7 +59,7 @@ module.exports = {
         return helper.response(response, 404, ` Input company`)
       } else {
         const result = await postExp(setData)
-        return helper.response(response, 201, "Experience Created", result);
+        return helper.response(response, 200, "Experience Added", result);
       }
     } catch (error) {
         console.log(error)
@@ -77,19 +78,20 @@ module.exports = {
         exp_updated_at: new Date(),
       }
       if (setData.exp_position === "") {
-        return helper.response(response, 404, ` Input your Position`)
+        return helper.response(response, 400, ` Input your Position`)
       } else if (setData.exp_company === "") {
-        return helper.response(response, 404, ` Input your Company`)
+        return helper.response(response, 400, ` Input your Company`)
       } else {
-        const checkId = await getExpById(id)
+        const checkId = await getExpByExpId(id)
         if (checkId.length > 0) {
           const result = await patchExp(setData, id)
-          return helper.response(response, 200, "Patch Done", result)
+          return helper.response(response, 200, "Experience updated", result)
         } else {
-          return helper.response(response, 404, "Not found", result)
+          return helper.response(response, 404, "Not found")
         }
       }
     } catch (error) {
+      console.log(error);
       return helper.response(response, 400, "Bad Request", error)
     }
   },
@@ -97,7 +99,7 @@ module.exports = {
     try {
       const { id } = request.params;
       const result = await deleteExp(id);
-      return helper.response(response, 200, "Delete Done", result);
+      return helper.response(response, 200, "Experience deleted", result);
     } catch (error) {
       return helper.response(response, 400, "Bad Request", error);
     }

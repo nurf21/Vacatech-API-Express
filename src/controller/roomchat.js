@@ -9,6 +9,7 @@ const {
   postNotification
 } = require("../model/roomchat")
 const { getUserById } = require("../model/users")
+const { getProfileById } = require("../model/profile")
 
 const helper = require("../helper/index")
 const { request, response } = require("express")
@@ -38,6 +39,10 @@ module.exports = {
           return value.user_id != user_id
         })
         const getInfo = await getUserById(filtered[0].user_id)
+        const getProfile = await getProfileById(filtered[0].user_id)
+        const profileImg = getProfile.map(value=>{
+          return value.profile_img
+        })
         const setData = {
           roomchat_id: ids,
           user_id: getInfo[0].user_id,
@@ -45,25 +50,17 @@ module.exports = {
           user_name: getInfo[0].user_name,
           user_img: getInfo[0].user_img,
           user_phone: getInfo[0].user_phone,
+          profile_img: profileImg[0]
         }
-        console.log(setData)
+        return setData
       }))
-      
-      // const getOtherId = await getIdFromRoomchat(result.roomchat_id)
-      // console.log(getOtherId)
-      // const mapped = result.map((item, index) => {
-      //   const filtered = item.filter(value => {
-
-      //   })
-      // })
-      if (result.length > 0) {
-        return helper.response(response, 200, "Succes get Roomchat By User Id", result)
+      if (otherId.length > 0) {
+        return helper.response(response, 200, "Succes get Roomchat By User Id", otherId)
       } else {
-        return helper.response(response, 404, `Message By Id : ${user_id} Not Found`)
+        return helper.response(response, 404, `Roomchat By Id : ${user_id} Not Found`)
       }
     } catch (error) {
-      // return helper.response(response, 400, "Bad Request", error)
-      console.log(error)
+      return helper.response(response, 400, "Bad Request", error)
     }
   },
   getMessageChatByRoom: async (request, response) => {

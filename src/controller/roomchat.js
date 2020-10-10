@@ -60,6 +60,7 @@ module.exports = {
         return helper.response(response, 404, `Roomchat By Id : ${user_id} Not Found`)
       }
     } catch (error) {
+      console.log(error)
       return helper.response(response, 400, "Bad Request", error)
     }
   },
@@ -97,19 +98,19 @@ module.exports = {
         request.body.user_worker === null ||
         request.body.user_worker === ""
       ) {
-        return helper.response(response, 404, "user worker must be filled");
+        return helper.response(response, 400, "user worker must be filled");
       } else if (
         request.body.user_recruiter === undefined ||
         request.body.user_recruiter === null ||
         request.body.user_recruiter === ""
       ) {
-        return helper.response(response, 404, "user recruiter must be filled");
+        return helper.response(response, 400, "user recruiter must be filled");
       } else if (
         request.body.msg === undefined ||
         request.body.msg === null ||
         request.body.msg === ""
       ) {
-        return helper.response(response, 404, "message must be filled");
+        return helper.response(response, 400, "message must be filled");
       } else {
         const roomChatId = Math.round(Math.random() * 100000)
         const setData = {
@@ -131,11 +132,12 @@ module.exports = {
         msg_created_at: new Date()
         }
         const postFirstMessage = await postMessage(setData3)
+        const recruiter = await getUserById(user_recruiter)
         const setData4 = {
-          roomchat_id: roomChatId,
           user_id: user_worker,
-          notif: "You've got a New Message",
-          notif_created_at: new Date()
+          message: `${recruiter[0].user_name} sent you a new message.`,
+          status: 0,
+          created_at: new Date()
         }
         const notification = await postNotification(setData4)
         const getMessageByChatRoom = await getMessageChatByRoom(roomChatId)

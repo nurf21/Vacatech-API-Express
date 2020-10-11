@@ -14,7 +14,7 @@ module.exports = {
   getCompanyProfileById: (id) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        "SELECT * FROM company_profile WHERE profile_id = ?",
+        "SELECT * FROM company_profile WHERE user_id = ?",
         id,
         (error, result) => {
           !error ? resolve(result) : reject(new Error(error))
@@ -22,19 +22,6 @@ module.exports = {
       )
     })
   },
-
-  getCompanyProfileById: (id) => {
-    return new Promise((resolve, reject) => {
-      connection.query(
-        "SELECT * FROM company_profile WHERE profile_id = ?",
-        id,
-        (error, result) => {
-          !error ? resolve(result) : reject(new Error(error))
-        }
-      )
-    })
-  },
- 
   postCompanyProfile: (setData) => {
     return new Promise((resolve, reject) => {
       connection.query(

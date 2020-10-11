@@ -23,6 +23,17 @@ module.exports = {
           )
         })
     },
+    getLatestMessageByRoom: (roomId) => {
+      return new Promise((resolve, reject) => {
+        connection.query(
+          "SELECT * FROM messages WHERE roomchat_id = ? ORDER BY msg_created_at DESC LIMIT 1",
+          roomId,
+          (error, result) => {
+            !error ? resolve(result) : reject(new Error(error));
+          }
+        )
+      })
+  },
     getRoomChatById: (id) => {
       return new Promise((resolve, reject) => {
         connection.query(

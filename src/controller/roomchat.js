@@ -81,6 +81,10 @@ module.exports = {
     try {
       const { roomchat_id } = request.params;
       const result = await getMessageChatByRoom(roomchat_id)
+      for (let i = 0; i < result.length; i++) {
+        userData = await getUserById(result[i].user_id)
+        result[i].user_name = userData[0].user_name
+      }
       if (result.length > 0) {
         return helper.response(response, 200, "Success get Message By Roomchat Id", result)
       } else {
@@ -169,11 +173,12 @@ module.exports = {
         msg,
         msg_created_at: new Date(),
       }
+      const sender = await getUserById(user_id)
       const setData2 = {
-        roomchat_id,
         user_id: receiver_id,
-        notif: "You've got a New Message",
-        notif_created_at: new Date()
+        message: `${sender[0].user_name} sent you a new message.`,
+        status: 0,
+        created_at: new Date()
       }
       if (setData.roomchat_id === "") {
         return helper.response(response, 404, ` Input roomchat id`)

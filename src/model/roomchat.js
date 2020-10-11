@@ -59,12 +59,28 @@ module.exports = {
     getNotificationById: (id) => {
       return new Promise((resolve, reject) => {
         connection.query(
-          "SELECT * FROM notification LEFT JOIN user ON notification.user_id = user.user_id WHERE notification.user_id = ?",
+          "SELECT * FROM notification WHERE user_id = ? AND status = 0",
           id,
           (error, result) => {
             !error ? resolve(result) : reject(new Error(error));
           }
         )
+      })
+    },
+    getUnseenNotification: (id) => {
+      return new Promise((resolve, reject) => {
+        connection.query(
+          'SELECT COUNT(*) AS count FROM notification WHERE user_id = ? AND status = 0', id, (error, result) => {
+            !error ? resolve(result[0].count) : reject(new Error(error))
+          }
+        )
+      })
+    },
+    patchNotification: (id, setData) => {
+      return new Promise((resolve, reject) => {
+        connection.query('UPDATE notification SET ? WHERE user_id = ?', [setData, id], (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        })
       })
     },
     postRoomChat: (setData) => {

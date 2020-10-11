@@ -2,12 +2,14 @@ const {
   getMessageChatByRoom, 
   getMessageByUserId, 
   getNotificationById,
+  getUnseenNotification,
   getRoomChatById,
   getIdFromRoomchat, 
   getLatestMessageByRoom,
   postRoomChat, 
   postMessage,
-  postNotification
+  postNotification,
+  patchNotification
 } = require("../model/roomchat")
 const { getUserById } = require("../model/users")
 const { getProfileById } = require("../model/profile")
@@ -97,14 +99,27 @@ module.exports = {
   getNotificationById: async (request, response) => {
     try {
       const { id } = request.params
-      const result = await getNotificationById(id)
-      if (result.length > 0) {
-        return helper.response(response, 200, "Succes get Notification By User Id", result)
-      } else {
-        return helper.response(response, 404, `Notification By Id : ${user_id} Not Found`)
+      const unseen = await getUnseenNotification(id)
+      const notification = await getNotificationById(id)
+      const result = {
+        unseen,
+        notification
       }
+      return helper.response(response, 200, "Succes get Notification By User Id", result)
     } catch (error) {
       return helper.response(response, 400, "Bad Request", error)
+    }
+  },
+  clickNotification: async (request, response) => {
+    const { id } = request.params
+    try {
+      const setData = {
+        status: 1
+      }
+      await patchNotification(id, setData)
+      return helper.response(response, 200, 'Notification seen')
+    } catch (error) {
+      return helper.response(response, 400, 'Bad Request', error)
     }
   },
   postRoomChat: async (request, response) => {

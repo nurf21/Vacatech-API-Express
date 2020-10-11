@@ -5,7 +5,8 @@ const {
     getRoomChatById, 
     getNotificationById,
     postRoomChat, 
-    postMessage 
+    postMessage,
+    clickNotification 
 } = require("../controller/roomchat")
 
 
@@ -16,6 +17,8 @@ router.get("/chat/notif/:id", getNotificationById)
 
 router.post("/", postRoomChat)
 router.post("/message", postMessage)
+
+router.patch('/chat/notif/:id', clickNotification)
 
 
 module.exports = router

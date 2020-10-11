@@ -1,6 +1,5 @@
 const router = require("express").Router()
 const {
-  getAllPortfolio,
   getPortfolioById,
   postPortfolio,
   patchPortfolio,
@@ -9,7 +8,6 @@ const {
 const imageFolio = require("../middleware/multerFolio");
 
 //GET
-router.get("/", getAllPortfolio)
 router.get("/:id", getPortfolioById)
 
 //POST

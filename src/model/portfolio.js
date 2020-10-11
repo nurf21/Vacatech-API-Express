@@ -1,13 +1,6 @@
 const connection = require("../config/mysql");
 
 module.exports = {
-  getAllPortfolio: () => {
-    return new Promise((resolve, reject) => {
-      connection.query("SELECT * FROM portfolio", (error, result) => {
-        !error ? resolve(result) : reject(new Error(error))
-      })
-    })
-  },
   getPortfolioById: (id) => {
     return new Promise((resolve, reject) => {
       connection.query(

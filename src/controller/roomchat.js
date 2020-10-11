@@ -12,7 +12,7 @@ const {
   patchNotification
 } = require("../model/roomchat")
 const { getUserById } = require("../model/users")
-const { getProfileById } = require("../model/profile")
+const { getProfileWorkerById } = require("../model/profile")
 const { getCompanyProfileById } = require("../model/companyProfile")
 
 const helper = require("../helper/index")
@@ -50,7 +50,7 @@ module.exports = {
         if(newest.length <=0){
           newest[0] = ''
         }
-        let getProfile = await getProfileById(filtered[0].user_id)
+        let getProfile = await getProfileWorkerById(filtered[0].user_id)
         if(getProfile.length <= 0){
           getProfile = await getCompanyProfileById(filtered[0].user_id)
         }
@@ -62,7 +62,6 @@ module.exports = {
           user_id: getInfo[0].user_id,
           user_email: getInfo[0].user_email,
           user_name: getInfo[0].user_name,
-          user_img: getInfo[0].user_img,
           user_phone: getInfo[0].user_phone,
           profile_img: profileImg[0],
           msg: newest[0]
@@ -209,5 +208,5 @@ module.exports = {
     } catch (error) {
         return helper.response(response, 400, "Bad Request", error);
     }
-  },
+  }
 }

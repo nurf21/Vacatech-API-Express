@@ -1,13 +1,6 @@
 const connection = require("../config/mysql")
 
 module.exports = {
-  getAllSkill: () => {
-    return new Promise((resolve, reject) => {
-      connection.query("SELECT * FROM skill", (error, result) => {
-        !error ? resolve(result) : reject(new Error(error))
-      })
-    })
-  },
   getSkillById: (id) => {
     return new Promise((resolve, reject) => {
       connection.query(

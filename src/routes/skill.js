@@ -1,6 +1,5 @@
 const router = require("express").Router()
 const {
-  getAllSkill,
   getSkillById,
   postSkill,
   patchSkill,
@@ -8,7 +7,6 @@ const {
 } = require("../controller/skill")
 
 //GET
-router.get("/", getAllSkill)
 router.get("/:id", getSkillById)
 
 //POST

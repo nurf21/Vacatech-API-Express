@@ -11,14 +11,6 @@ const helper = require("../helper/index")
 const { request, response } = require("express")
 
 module.exports = {
-  getAllExp: async (request, response) => {
-    try {
-      const result = await getAllExp()
-      return helper.response(response, 200, "Success get Experience", result)
-    } catch (error) {
-      return helper.response(response, 400, "Bad Request", error)
-    }
-  },
   getExpById: async (request, response) => {
     try {
       const { id } = request.params

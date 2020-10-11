@@ -1,13 +1,6 @@
 const connection = require("../config/mysql")
 
 module.exports = {
-  getAllExp: () => {
-    return new Promise((resolve, reject) => {
-      connection.query("SELECT * FROM experience", (error, result) => {
-        !error ? resolve(result) : reject(new Error(error))
-      })
-    })
-  },
   getExpById: (id) => {
     return new Promise((resolve, reject) => {
       connection.query(

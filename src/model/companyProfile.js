@@ -1,16 +1,6 @@
 const connection = require("../config/mysql")
 
 module.exports = {
-  getCompanyProfile: () => {
-    return new Promise((resolve, reject) => {
-      connection.query(
-        `SELECT * FROM company_profile`,
-        (error, result) => {
-          !error ? resolve(result) : reject(new Error(error))
-        }
-      )
-    })
-  },
   getCompanyProfileById: (id) => {
     return new Promise((resolve, reject) => {
       connection.query(
@@ -57,23 +47,5 @@ module.exports = {
         }
       )
     })
-  },
-  deleteCompanyProfile: (id) => {
-    return new Promise((resolve, reject) => {
-      connection.query(
-        "DELETE FROM company_profile WHERE profile_id = ?",
-        id,
-        (error, result) => {
-          if (!error) {
-            const newResult = {
-              id: id,
-            }
-            resolve(newResult);
-          } else {
-            reject(new Error(error));
-          }
-        }
-      )
-    })
-  },
+  }
 }

@@ -1,6 +1,5 @@
 const router = require("express").Router()
 const {
-  getAllExp,
   getExpById,
   postExp,
   patchExp,
@@ -8,7 +7,6 @@ const {
 } = require("../controller/experience")
 
 //GET
-router.get("/", getAllExp)
 router.get("/:id", getExpById)
 
 //POST

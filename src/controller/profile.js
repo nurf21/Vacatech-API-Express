@@ -4,8 +4,7 @@ const {
   getProfileCompanyById,
   getProfileWorkerById,
   getProfileCount,
-  patchProfile,
-  deleteProfile,
+  patchProfile
 } = require("../model/profile")
 const { getUserById, patchUser } = require('../model/users')
 const fs = require("fs");
@@ -39,7 +38,6 @@ const getNextLink = (page, totalPage, currentQuery) => {
 module.exports = {
   getAllProfile: async (request, response) => {
     let { page, limit, search, sort } = request.query
-
     if (search === undefined || search === "") {
       search = "%"
     } else {
@@ -58,7 +56,6 @@ module.exports = {
     } else {
       limit = parseInt(limit)
     }
-
     page = parseInt(page)
     limit = parseInt(limit)
     let totalData = await getProfileCount()
@@ -206,25 +203,5 @@ module.exports = {
       console.log(error)
       return helper.response(response, 400, "Bad Request", error)
     }
-  },
-  deleteProfile: async (request, response) => {
-    try {
-      const { id } = request.params;
-      const checkId = await getProfileById(id);
-      if (checkId.length > 0) {
-        fs.unlink(`./uploads/${checkId[0].profile_img}`, async (error) => {
-          if (error) {
-            throw error;
-          } else {
-            const result = await deleteProfile(id);
-            return helper.response(response, 201, "Profile Deleted", result);
-          }
-        });
-      } else {
-        return helper.response(response, 404, ` Not Found`);
-      }
-    } catch (error) {
-      return helper.response(response, 400, "Bad Request", error);
-    }
-  },
+  }
 };

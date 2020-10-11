@@ -1,5 +1,4 @@
 const {
-  getAllPortfolio,
   getPortfolioById,
   getPortflioByPortfolioId,
   postPortfolio,
@@ -12,14 +11,6 @@ const helper = require("../helper/index")
 const { request, response } = require("express")
 
 module.exports = {
-  getAllPortfolio: async (request, response) => {
-    try {
-      const result = await getAllPortfolio()
-      return helper.response(response, 200, "Success get Portfolio", result)
-    } catch (error) {
-      return helper.response(response, 400, "Bad Request", error)
-    }
-  },
   getPortfolioById: async (request, response) => {
     try {
       const { id } = request.params

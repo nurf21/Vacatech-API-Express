@@ -1,5 +1,4 @@
 const {
-  getAllSkill,
   getSkillById,
   getSkillBySkillId,
   postSkill,
@@ -8,17 +7,8 @@ const {
 } = require("../model/skill")
 
 const helper = require("../helper/index")
-const { request, response } = require("express")
 
 module.exports = {
-  getAllSkill: async (request, response) => {
-    try {
-      const result = await getAllSkill()
-      return helper.response(response, 200, "Success get Skill", result)
-    } catch (error) {
-      return helper.response(response, 400, "Bad Request", error)
-    }
-  },
   getSkillById: async (request, response) => {
     try {
       const { id } = request.params;
